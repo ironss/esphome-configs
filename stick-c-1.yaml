@@ -1,0 +1,142 @@
+esphome:
+  name: stick-c-1
+  platformio_options:
+    upload_speed: 500000
+
+esp32:
+  board: m5stick-c
+  framework:
+    # External component axp192 requires arduino framework
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_psk
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: !secret ap_ssid
+    password: !secret ap_psk
+
+captive_portal:
+
+light:
+  - platform: monochromatic
+    output: builtin_led
+    name: LED
+    id: led1
+
+output:
+  - platform: ledc
+    pin: 10
+    inverted: true
+    id: builtin_led
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO37
+      inverted: true
+    name: Button A
+    on_press:
+      then:
+        - light.toggle: led1
+
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: true
+    name: Button B
+    on_press:
+      then:
+        - light.turn_on: led1
+    on_release:
+      then:
+        - light.turn_off: led1
+
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO15
+  
+display:
+  - platform: st7735
+    model: "INITR_MINI160X80"
+    reset_pin: GPIO18
+    cs_pin: GPIO5
+    dc_pin: GPIO23
+    rotation: 270
+    device_width: 80
+    device_height: 160
+    col_start: 26
+    row_start: 1
+    use_bgr: true
+    invert_colors: true
+    eight_bit_color: true
+    update_interval: 10s
+#    show_test_card: true
+    
+    id: disp_1
+    pages:
+      - id: page_1
+        lambda: |-
+          it.print(0, 10, id(roboto_12), "Page 1");
+          
+      - id: page_2
+        lambda: |-
+          it.print(0, 10, id(roboto_12), "Page 2");
+         
+
+interval:
+  - interval: 5s
+    then:
+      - display.page.show_next: disp_1
+      - component.update: disp_1
+    
+    
+font:
+  - file: "gfonts://Roboto"
+    size: 12
+    id: roboto_12
+
+
+i2c:
+  - id: bus_a
+    sda: GPIO21
+    scl: GPIO22
+    scan: true
+
+# AXP192 power management - must be present to initialize TFT power on
+external_components:
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
+
+sensor:
+  - platform: axp192
+    model: M5STICKC
+    address: 0x34
+    i2c_id: bus_a
+    update_interval: 30s
+    battery_level:
+      name: "Battery Level"
+      id: "battery_level"
+
+  - platform: wifi_signal
+    name: WiFi Level
+    id: wifi_dbm
+    
+  - platform: uptime
+    name: Uptime
+
