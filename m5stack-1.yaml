@@ -1,6 +1,9 @@
 esphome:
   name: m5stack-1
 
+packages:
+    rtl_433: github://juanboro/esphome-rtl_433-decoder/rtl_433.yaml
+
 esp32:
   board: m5stack-core-esp32
   framework:
@@ -22,38 +25,41 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_psk
 
+
 binary_sensor:
   - platform: gpio
     pin:
       number: GPIO39
       inverted: true
     name: Button A
-
+    id: btn_A
+    
   - platform: gpio
     pin:
       number: GPIO38
       inverted: true
     name: Button B
-     
+    id: btn_B
+    
   - platform: gpio
     pin:
       number: GPIO37
       inverted: true
     name: Button C
-     
+    id: btn_C
 
 spi:
-  - id: spi_a
-    clk_pin: GPIO18
+  - clk_pin: GPIO18
     mosi_pin: GPIO23
     miso_pin: GPIO19
+    id: spi_A
     
 i2c:
-  - id: i2c_a
-    sda: GPIO21
+  - sda: GPIO21
     scl: GPIO22
     scan: true
-
+    id: i2c_a
+    
 sensor:
   - platform: lps22
     address: 0x5D
@@ -62,6 +68,12 @@ sensor:
     pressure:
       name: "LPS22 pressure"
 
+  - platform: template
+    name: "WX temperature"
+    id: wx_temperature_C
+    unit_of_measurement: "°C"
+    
+    
 sx127x:
   cs_pin: GPIO05
   rst_pin: GPIO26
@@ -77,6 +89,16 @@ sx127x:
 
 remote_receiver:
   - pin: GPIO13
-    dump: raw
-    id: rx1
-    
+#    dump: all
+    id: rf_A
+
+rtl_433:
+  id: rtl_A
+  receiver_id: rf_A
+  on_json_message:
+    then:
+      - lambda: |-
+          if ((x["model"] == "Fineoffset-WHx080") && (x["id"].as<int>() == 87)) {
+            id(wx_temperature_C).publish_state(x["temperature_C"].as<float>());
+          }
+        
