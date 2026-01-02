@@ -25,18 +25,22 @@ TODO
     [X] Use 433 MHz SX1275 (LoRa chip)
     [X] Decode weather station data
     [X] Make data available as input value for Home Assistant
-    [ ] Remove unwanted decoders from RTL-433
+    [ ] Remove unwanted decoders from RTL-433 to speed it up
     [ ] Display data on LCD
     [ ] Send data to Thingsboard
     [ ] Send data to WoW
     [ ] Send data to OpenWeatherMap
+
+[ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
     
 [ ] IR controller for heatpump
-[ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
+[ ] Bus arrival times from Google
+    [ ] Shown on remote display
+[ ] Weather forecast on remote display
 
 [ ] Configuration for M5Stack Core
     [X] Basic config
-    [ ] Display config
+    [X] Display config
     [X] Buttons
     [X] LoRa 433 MHz module
     [ ] GNSS module
@@ -45,7 +49,8 @@ TODO
     [X] OOK decoder
     [X] RTL_433 decoder
     [ ] Fonts
-
+    [ ] Backlight seems a bit dim
+    
 [ ] Configuration for M5Knob
     [ ] Basic config
     [ ] Display
@@ -55,5 +60,5 @@ TODO
 [ ] Find out how to modularise the configuration
     [X] Fixed values
     [ ] Substitutable (parameterised) values
-    
+    [ ] Move automations away from the place where (eg.) the buttons are defined    
 

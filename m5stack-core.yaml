@@ -5,20 +5,46 @@ binary_sensor:
       inverted: true
     name: Button A
     id: btn_A
-    
+    on_press:
+      then:
+        - output.turn_on:
+            id: lcd_bl
+        - output.set_level:
+            id: lcd_bl
+            level: 100%
+
   - platform: gpio
     pin:
       number: GPIO38
       inverted: true
     name: Button B
     id: btn_B
-    
+    on_press:
+      then:
+        - output.turn_on:
+            id: lcd_bl
+        - output.set_level:
+            id: lcd_bl
+            level: 50%
+
   - platform: gpio
     pin:
       number: GPIO37
       inverted: true
     name: Button C
     id: btn_C
+    on_press:
+      then:
+        - output.turn_off:
+            id: lcd_bl
+
+
+output:
+  - platform: ledc
+    pin: GPIO32
+    inverted: false
+    id: lcd_bl
+
 
 spi:
   - clk_pin: GPIO18
@@ -31,4 +57,23 @@ i2c:
     scl: GPIO22
     scan: true
     id: i2c_A
+
+display:
+  - platform: mipi_spi
+    model: ILI9341
+    id: lcd_A
+    reset_pin: GPIO33
+    cs_pin: GPIO14
+    dc_pin: GPIO27
+    data_rate: 40MHz
+    invert_colors: true
+    pixel_mode: 16bit
+    dimensions:
+      width: 320
+      height: 240
+    transform: # must be explicitly set until bug is fixed
+      swap_xy: false
+      mirror_x: false
+      mirror_y: false
+    show_test_card: true
 
