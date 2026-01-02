@@ -70,8 +70,33 @@ sensor:
 
   - platform: template
     name: "WX temperature"
-    id: wx_temperature_C
+    id: wx_temperature
     unit_of_measurement: "°C"
+
+  - platform: template
+    name: "WX humidity"
+    id: wx_humidity
+    unit_of_measurement: "%RH"
+    
+  - platform: template
+    name: "WX rain"
+    id: wx_rain
+    unit_of_measurement: "mm"
+
+  - platform: template
+    name: "WX wind direction"
+    id: wx_wind_dir
+    unit_of_measurement: "°"
+
+  - platform: template
+    name: "WX wind average"
+    id: wx_wind_avg
+    unit_of_measurement: "m.s-1"
+
+  - platform: template
+    name: "WX wind max"
+    id: wx_wind_max
+    unit_of_measurement: "m.s-1"
     
     
 sx127x:
@@ -99,6 +124,11 @@ rtl_433:
     then:
       - lambda: |-
           if ((x["model"] == "Fineoffset-WHx080") && (x["id"].as<int>() == 87)) {
-            id(wx_temperature_C).publish_state(x["temperature_C"].as<float>());
+            id(wx_temperature).publish_state(x["temperature_C"].as<float>());
+            id(wx_humidity).publish_state(x["humidity"].as<float>());
+            id(wx_rain).publish_state(x["rain_mm"].as<float>());
+            id(wx_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
+            id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
+            id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
           }
         
