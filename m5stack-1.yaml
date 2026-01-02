@@ -22,10 +22,61 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_psk
 
-#  # Enable fallback hotspot (captive portal) in case wifi connection fails
-#  ap:
-#    ssid: !secret ap_ssid
-#    password: !secret ap_psk
-#
-#captive_portal:
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: true
+    name: Button A
 
+  - platform: gpio
+    pin:
+      number: GPIO38
+      inverted: true
+    name: Button B
+     
+  - platform: gpio
+    pin:
+      number: GPIO37
+      inverted: true
+    name: Button C
+     
+
+spi:
+  - id: spi_a
+    clk_pin: GPIO18
+    mosi_pin: GPIO23
+    miso_pin: GPIO19
+    
+i2c:
+  - id: i2c_a
+    sda: GPIO21
+    scl: GPIO22
+    scan: true
+
+sensor:
+  - platform: lps22
+    address: 0x5D
+    temperature:
+      name: "LPS22 temperature"
+    pressure:
+      name: "LPS22 pressure"
+
+sx127x:
+  cs_pin: GPIO05
+  rst_pin: GPIO26
+  dio0_pin: GPIO36
+  frequency: 433920000
+  modulation: OOK
+  rx_start: true
+  bitsync: true
+  packet_mode: true
+  on_packet:
+    then:
+      - lambda: |-
+          ESP_LOGD("lambda", "packet %s", format_hex(x).c_str());
+          ESP_LOGD("lambda", "rssi %.2f", rssi);
+          ESP_LOGD("lambda", "snr %.2f", snr);
+
+  
+  
