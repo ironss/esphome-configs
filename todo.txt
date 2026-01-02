@@ -31,10 +31,11 @@ TODO
     [ ] Send data to OpenWeatherMap
     
 [ ] IR controller for heatpump
+[ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
 
 [ ] Configuration for M5Stack Core
     [X] Basic config
-    [ ] Display
+    [ ] Display config
     [X] Buttons
     [X] LoRa 433 MHz module
     [ ] GNSS module
@@ -42,10 +43,11 @@ TODO
     [X] LPS25HW module
     [X] OOK decoder
     [X] RTL_433 decoder
+    [ ] Fonts
 
 [ ] Configuration for M5Knob
     [ ] Basic config
     [ ] Display
     [ ] Dial
     [ ] Button
-    
+

@@ -1,5 +1,5 @@
 esphome:
-  name: m5stack-1
+  name: m5s-0001
 
 packages:
     rtl_433: github://juanboro/esphome-rtl_433-decoder/rtl_433.yaml
@@ -20,6 +20,7 @@ api:
 ota:
   - platform: esphome
     password: !secret ota_password
+
 
 wifi:
   ssid: !secret wifi_ssid
