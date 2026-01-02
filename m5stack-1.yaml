@@ -1,0 +1,31 @@
+esphome:
+  name: m5stack-1
+
+esp32:
+  board: m5stack-core-esp32
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_psk
+
+#  # Enable fallback hotspot (captive portal) in case wifi connection fails
+#  ap:
+#    ssid: !secret ap_ssid
+#    password: !secret ap_psk
+#
+#captive_portal:
+
