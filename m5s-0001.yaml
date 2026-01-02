@@ -24,8 +24,17 @@ ota:
 
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_psk
+  networks:
+    - ssid: "ioSphere dev"
+      password: !secret "wifi_psk_ioSphere dev"
+      manual_ip:
+        static_ip: 192.168.1.161
+        gateway: 192.168.1.1
+        subnet: 255.255.255.0
+        
+    - ssid: "wodexitose"
+      password: !secret "wifi_psk_wodexitose"
+
 
 sensor:
   - platform: lps22
@@ -103,4 +112,4 @@ rtl_433:
             id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
             id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
           }
-        
+
