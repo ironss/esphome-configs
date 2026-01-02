@@ -3,18 +3,23 @@ TODO
 
 [X] Move secrets into secrets file
 
-[X] Find and set a higher download speed: M5Stick-C supports 500 MHz
-
-[X] Find and set display settings
-
-[ ] Use MIPI SPI display driver rather than ST7735
-[ ] Use M5Stick-C display as a display device for Home Assistant
-[ ] Choose a few suitable fonts
-    [ ] Small text
-    [ ] Standard text, normal
-    [ ] Standard text, bold
-    [ ] Header text, bold
+[ ] M5Stick-C
+    [X] Higher download speed: M5Stick-C supports 500 MHz
+        [X] and 750 MHz
     
+    [X] Find and set display configuration
+    
+    [X] Choose a few suitable fonts
+        [X] Standard text, normal: 75dpi/helvR10.bdf
+        [X] Standard text, bold: 75dpi/helvB10.bdf
+        [X] Header text, bold: 75dpi/helvB12.bdf
+        [X] Small text: 75dpi/helvR08.bdf
+    
+    [X] Create an example diagnostics page
+    [ ] Use MIPI SPI display driver rather than ST7735
+
+[ ] Use display to show Home Assistant data, rather than ESPHome internals
+
 [ ] 433 MHz weather station receiver
     [ ] Connect 433 MHz receiver to ESPHome device
     [ ] Use 433 MHz SX1275 (LoRa chip)
@@ -22,3 +27,18 @@ TODO
     [ ] Make data available as input value for Home Assistant
 
 [ ] IR controller for heatpump
+
+[ ] Configuration for M5Stack Core
+    [ ] Basic config
+    [ ] Display
+    [ ] Buttons
+    [ ] LoRa 433 MHz module
+    [ ] GNSS module
+    [ ] BMP180 module
+    [ ] LPS25HW module
+    
+[ ] Configuration for M5Knob
+    [ ] Basic config
+    [ ] Display
+    [ ] Dial
+    [ ] Button
