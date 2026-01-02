@@ -1,0 +1,34 @@
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: true
+    name: Button A
+    id: btn_A
+    
+  - platform: gpio
+    pin:
+      number: GPIO38
+      inverted: true
+    name: Button B
+    id: btn_B
+    
+  - platform: gpio
+    pin:
+      number: GPIO37
+      inverted: true
+    name: Button C
+    id: btn_C
+
+spi:
+  - clk_pin: GPIO18
+    mosi_pin: GPIO23
+    miso_pin: GPIO19
+    id: spi_A
+    
+i2c:
+  - sda: GPIO21
+    scl: GPIO22
+    scan: true
+    id: i2c_A
+

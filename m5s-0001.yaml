@@ -2,6 +2,7 @@ esphome:
   name: m5s-0001
 
 packages:
+    core: !include m5stack-core.yaml
     rtl_433: github://juanboro/esphome-rtl_433-decoder/rtl_433.yaml
 
 esp32:
@@ -26,41 +27,6 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_psk
 
-
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO39
-      inverted: true
-    name: Button A
-    id: btn_A
-    
-  - platform: gpio
-    pin:
-      number: GPIO38
-      inverted: true
-    name: Button B
-    id: btn_B
-    
-  - platform: gpio
-    pin:
-      number: GPIO37
-      inverted: true
-    name: Button C
-    id: btn_C
-
-spi:
-  - clk_pin: GPIO18
-    mosi_pin: GPIO23
-    miso_pin: GPIO19
-    id: spi_A
-    
-i2c:
-  - sda: GPIO21
-    scl: GPIO22
-    scan: true
-    id: i2c_a
-    
 sensor:
   - platform: lps22
     address: 0x5D

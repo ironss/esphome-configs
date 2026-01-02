@@ -18,13 +18,14 @@ TODO
     [X] Create an example diagnostics page
     [ ] Use MIPI SPI display driver rather than ST7735
 
-[ ] Use display to show Home Assistant data, rather than ESPHome internals
+[ ] Use display to show Home Assistant data, rather than (or as well as) ESPHome internals
 
 [ ] 433 MHz weather station receiver
     [ ] Connect 433 MHz receiver to ESPHome device
     [X] Use 433 MHz SX1275 (LoRa chip)
     [X] Decode weather station data
     [X] Make data available as input value for Home Assistant
+    [ ] Remove unwanted decoders from RTL-433
     [ ] Display data on LCD
     [ ] Send data to Thingsboard
     [ ] Send data to WoW
@@ -50,4 +51,9 @@ TODO
     [ ] Display
     [ ] Dial
     [ ] Button
+
+[ ] Find out how to modularise the configuration
+    [X] Fixed values
+    [ ] Substitutable (parameterised) values
+    
 
