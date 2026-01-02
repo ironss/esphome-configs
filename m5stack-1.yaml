@@ -72,33 +72,39 @@ sensor:
     name: "WX temperature"
     id: wx_temperature
     unit_of_measurement: "°C"
-
+    icon: "mdi:thermometer" 
+    
   - platform: template
     name: "WX humidity"
     id: wx_humidity
     unit_of_measurement: "%RH"
+    icon: "mdi:water-percent"
     
   - platform: template
     name: "WX rain"
     id: wx_rain
     unit_of_measurement: "mm"
+    icon: "mdi:water"
 
   - platform: template
     name: "WX wind direction"
     id: wx_wind_dir
     unit_of_measurement: "°"
-
+    icon: "mdi:compass"
+    
   - platform: template
     name: "WX wind average"
     id: wx_wind_avg
     unit_of_measurement: "m.s-1"
+    icon: "mdi:weather-windy"
 
   - platform: template
     name: "WX wind max"
     id: wx_wind_max
     unit_of_measurement: "m.s-1"
-    
-    
+    icon: "mdi:weather-windy"
+        
+
 sx127x:
   cs_pin: GPIO05
   rst_pin: GPIO26
@@ -114,7 +120,6 @@ sx127x:
 
 remote_receiver:
   - pin: GPIO13
-#    dump: all
     id: rf_A
 
 rtl_433:
