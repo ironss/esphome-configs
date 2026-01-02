@@ -22,23 +22,30 @@ TODO
 
 [ ] 433 MHz weather station receiver
     [ ] Connect 433 MHz receiver to ESPHome device
-    [ ] Use 433 MHz SX1275 (LoRa chip)
-    [ ] Decode weather station data
-    [ ] Make data available as input value for Home Assistant
-
+    [X] Use 433 MHz SX1275 (LoRa chip)
+    [X] Decode weather station data
+    [X] Make data available as input value for Home Assistant
+    [ ] Display data on LCD
+    [ ] Send data to Thingsboard
+    [ ] Send data to WoW
+    [ ] Send data to OpenWeatherMap
+    
 [ ] IR controller for heatpump
 
 [ ] Configuration for M5Stack Core
-    [ ] Basic config
+    [X] Basic config
     [ ] Display
-    [ ] Buttons
-    [ ] LoRa 433 MHz module
+    [X] Buttons
+    [X] LoRa 433 MHz module
     [ ] GNSS module
     [ ] BMP180 module
-    [ ] LPS25HW module
-    
+    [X] LPS25HW module
+    [X] OOK decoder
+    [X] RTL_433 decoder
+
 [ ] Configuration for M5Knob
     [ ] Basic config
     [ ] Display
     [ ] Dial
     [ ] Button
+    
