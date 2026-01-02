@@ -1,0 +1,24 @@
+TODO
+====
+
+[X] Move secrets into secrets file
+
+[X] Find and set a higher download speed: M5Stick-C supports 500 MHz
+
+[X] Find and set display settings
+
+[ ] Use MIPI SPI display driver rather than ST7735
+[ ] Use M5Stick-C display as a display device for Home Assistant
+[ ] Choose a few suitable fonts
+    [ ] Small text
+    [ ] Standard text, normal
+    [ ] Standard text, bold
+    [ ] Header text, bold
+    
+[ ] 433 MHz weather station receiver
+    [ ] Connect 433 MHz receiver to ESPHome device
+    [ ] Use 433 MHz SX1275 (LoRa chip)
+    [ ] Decode weather station data
+    [ ] Make data available as input value for Home Assistant
+
+[ ] IR controller for heatpump
