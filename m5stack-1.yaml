@@ -67,16 +67,16 @@ sx127x:
   rst_pin: GPIO26
   dio0_pin: GPIO36
   frequency: 433920000
+  bandwidth: 50_0kHz
   modulation: OOK
   rx_start: true
+  packet_mode: false
   bitsync: true
-  packet_mode: true
-  on_packet:
-    then:
-      - lambda: |-
-          ESP_LOGD("lambda", "packet %s", format_hex(x).c_str());
-          ESP_LOGD("lambda", "rssi %.2f", rssi);
-          ESP_LOGD("lambda", "snr %.2f", snr);
+  bitrate: 4800
+  rx_floor: -90
 
-  
-  
+remote_receiver:
+  - pin: GPIO13
+    dump: raw
+    id: rx1
+    
