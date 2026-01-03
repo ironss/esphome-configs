@@ -1,5 +1,12 @@
 esphome:
   name: m5s-0001
+  on_boot:
+    then:
+      - output.turn_on:
+          id: lcd_bl
+      - output.set_level:
+          id: lcd_bl
+          level: 100%
 
 packages:
     core: !include m5stack-core.yaml
