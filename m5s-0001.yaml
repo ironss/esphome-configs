@@ -41,14 +41,35 @@ sensor:
     address: 0x5D
     temperature:
       name: "LPS22 temperature"
+      on_value:
+        - lvgl.label.update:
+            id: page_wx_temperature_inside
+            text:
+              format: "%.1f"
+              args:
+                - x
     pressure:
       name: "LPS22 pressure"
+      on_value:
+        - lvgl.label.update:
+            id: page_wx_pressure
+            text:
+              format: "%.1f"
+              args:
+                - x
 
   - platform: template
     name: "WX temperature"
     id: wx_temperature
     unit_of_measurement: "°C"
     icon: "mdi:thermometer" 
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_temperature
+          text:
+            format: "%.1f"
+            args:
+              - x
     
   - platform: template
     name: "WX humidity"
@@ -112,4 +133,97 @@ rtl_433:
             id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
             id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
           }
+
+
+lvgl:
+  displays:
+    - lcd_A
+  pages:
+    - id: page_wx
+      layout:
+        type: grid
+        grid_rows: [ content, content, content, content ]
+        grid_columns: [ content, content, content ]
+      widgets:
+        - label:
+            grid_cell_row_pos: 0
+            grid_cell_column_pos: 0
+            grid_cell_column_span: 3
+            text: "Weather"
+            text_align: LEFT
+            text_font: heading
+
+        - label:
+            grid_cell_row_pos: 1
+            grid_cell_column_pos: 0
+            text: "Temperature"
+            text_align: LEFT
+            text_font: text_normal
+        - label:
+            id: page_wx_temperature
+            grid_cell_row_pos: 1
+            grid_cell_column_pos: 1
+            text: "--"
+            text_align: RIGHT
+            text_font: text_bold
+        - label:
+            grid_cell_row_pos: 1
+            grid_cell_column_pos: 2
+            text: "°C"
+            text_align: LEFT
+            text_font: text_normal
+
+        - label:
+            grid_cell_row_pos: 2
+            grid_cell_column_pos: 0
+            text: "Pressure"
+            text_align: LEFT
+            text_font: text_normal
+        - label:
+            id: page_wx_pressure
+            grid_cell_row_pos: 2
+            grid_cell_column_pos: 1
+            text: "--"
+            text_align: RIGHT
+            text_font: text_bold
+        - label:
+            grid_cell_row_pos: 2
+            grid_cell_column_pos: 2
+            text: "°C"
+            text_align: LEFT
+            text_font: text_normal
+
+        - label:
+            grid_cell_row_pos: 3
+            grid_cell_column_pos: 0
+            text: "Temperature in"
+            text_align: LEFT
+            text_font: text_normal
+        - label:
+            id: page_wx_temperature_inside
+            grid_cell_row_pos: 3
+            grid_cell_column_pos: 1
+            text: "--"
+            text_align: RIGHT
+            text_font: text_bold
+        - label:
+            grid_cell_row_pos: 3
+            grid_cell_column_pos: 2
+            text: "°C"
+            text_align: LEFT
+            text_font: text_normal
+
+
+font:
+  - file: "fonts/bdf/75dpi/helvR14.bdf"
+    id: text_normal
+
+  - file: "fonts/bdf/75dpi/helvB14.bdf"
+    id: text_bold
+
+  - file: "fonts/bdf/75dpi/helvB18.bdf"
+    id: heading
+
+  - file: "fonts/bdf/75dpi/helvR10.bdf"
+    id: text_tiny
 
