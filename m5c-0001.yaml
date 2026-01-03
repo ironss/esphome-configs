@@ -3,6 +3,11 @@ esphome:
   platformio_options:
     upload_speed: 750000
 
+external_components:
+  # AXP192 power management needed to turn TFT power on
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
+
 esp32:
   board: m5stick-c
   framework:
@@ -21,9 +26,13 @@ ota:
   - platform: esphome
     password: !secret ota_password
 
+
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_psk
+  networks:
+    - ssid: !secret wifi1_ssid
+      password: !secret wifi1_psk
+    - ssid: !secret wifi2_ssid
+      password: !secret wifi2_psk
 
 
 light:
@@ -132,11 +141,6 @@ i2c:
     sda: GPIO21
     scl: GPIO22
     scan: true
-
-# AXP192 power management - must be present to initialize TFT power on
-external_components:
-  - source: github://martydingo/esphome-axp192
-    components: [axp192]
 
 sensor:
   - platform: axp192
