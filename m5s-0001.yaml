@@ -48,6 +48,7 @@ sensor:
     address: 0x5D
     temperature:
       name: "LPS22 temperature"
+      accuracy_decimals: 1
       on_value:
         - lvgl.label.update:
             id: page_wx_value_temperature_in
@@ -57,6 +58,7 @@ sensor:
                 - x
     pressure:
       name: "LPS22 pressure"
+      accuracy_decimals: 1
       on_value:
         - lvgl.label.update:
             id: page_wx_value_pressure
@@ -68,6 +70,7 @@ sensor:
   - platform: template
     name: "WX temperature"
     id: wx_temperature
+    accuracy_decimals: 1
     unit_of_measurement: "°C"
     icon: "mdi:thermometer" 
     on_value:
@@ -81,6 +84,7 @@ sensor:
   - platform: template
     name: "WX humidity"
     id: wx_humidity
+    accuracy_decimals: 1
     unit_of_measurement: "%RH"
     icon: "mdi:water-percent"
     on_value:
@@ -91,21 +95,86 @@ sensor:
             args:
               - x
     
+    
   - platform: template
-    name: "WX rain"
-    id: wx_rain
+    name: "WX rain total"
+    id: wx_rain_total
+    accuracy_decimals: 1
     unit_of_measurement: "mm"
     icon: "mdi:water"
+#    on_value:
+#      - lvgl.label.update:
+#          id: page_wx_value_rain_total
+#          text:
+#            format: "%.1f"
+#            args:
+#              - x
+
+  - platform: template
+    name: "WX rain 05min"
+    id: wx_rain_5min
+    accuracy_decimals: 1
+    unit_of_measurement: "mm"
+    icon: "mdi:water"
+    filters:
+      - heartbeat: 30s
+      - delay_delta:
+          window_size: 10
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_rain_5min
+          text:
+            format: "%.1f"
+            args:
+              - x
+
+  - platform: template
+    name: "WX rain 1h"
+    id: wx_rain_1h
+    accuracy_decimals: 1
+    unit_of_measurement: "mm"
+    icon: "mdi:water"
+    filters:
+      - heartbeat: 5min
+      - delay_delta:
+          window_size: 12
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_rain_1h
+          text:
+            format: "%.1f"
+            args:
+              - x
+
+  - platform: template
+    name: "WX rain 24h"
+    id: wx_rain_24h
+    accuracy_decimals: 1
+    unit_of_measurement: "mm"
+    icon: "mdi:water"
+    filters:
+      - heartbeat: 5min
+      - delay_delta:
+          window_size: 288
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_rain_24h
+          text:
+            format: "%.1f"
+            args:
+              - x
 
   - platform: template
     name: "WX wind direction"
     id: wx_wind_dir
+    accuracy_decimals: 1
     unit_of_measurement: "°"
     icon: "mdi:compass"
     
   - platform: template
     name: "WX wind average"
     id: wx_wind_avg
+    accuracy_decimals: 1
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
     on_value:
@@ -125,18 +194,40 @@ sensor:
   - platform: template
     name: "WX wind max"
     id: wx_wind_max
+    accuracy_decimals: 1
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
 
   - platform: template
-    name: "WX wind vector N"
-    id: wx_wind_n
+    name: "WX wind vector N smooth"
+    id: wx_wind_n_smooth
+    accuracy_decimals: 3
     unit_of_measurement: ""
+    filters:
+      exponential_moving_average:
+        alpha: 0.1
+        send_every: 1
+        send_first_at: 1
+            
+  - platform: template
+    name: "WX wind vector E smooth"
+    id: wx_wind_e_smooth
+    accuracy_decimals: 3
+    unit_of_measurement: ""
+    filters:
+      exponential_moving_average:
+        alpha: 0.1
+        send_every: 1
+        send_first_at: 1
     
   - platform: template
-    name: "WX wind vector E"
-    id: wx_wind_e
-    unit_of_measurement: ""
+    name: "WX wind direction smooth"
+    id: wx_wind_dir_smooth
+    accuracy_decimals: 1
+    unit_of_measurement: "°"
+    lambda: |-
+      return -std::atan2(id(wx_wind_n_smooth).state, id(wx_wind_e_smooth).state) * 360 / 2 / std::numbers::pi;
+    update_interval: 60s
         
 
 sx127x:
@@ -165,12 +256,15 @@ rtl_433:
           if ((x["model"] == "Fineoffset-WHx080") && (x["id"].as<int>() == 87)) {
             id(wx_temperature).publish_state(x["temperature_C"].as<float>());
             id(wx_humidity).publish_state(x["humidity"].as<float>());
-            id(wx_rain).publish_state(x["rain_mm"].as<float>());
+            id(wx_rain_total).publish_state(x["rain_mm"].as<float>());
+            id(wx_rain_5min).publish_state(x["rain_mm"].as<float>());
+            id(wx_rain_1h).publish_state(x["rain_mm"].as<float>());
+            id(wx_rain_24h).publish_state(x["rain_mm"].as<float>());
             id(wx_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
             id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
             id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
-            id(wx_wind_n).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
-            id(wx_wind_e).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
+            id(wx_wind_n_smooth).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
+            id(wx_wind_e_smooth).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
           }
 
 

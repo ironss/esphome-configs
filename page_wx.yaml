@@ -1,7 +1,7 @@
 id: page_wx
 layout:
   type: grid
-  grid_rows: [ content, content, content, content, content, content, content ]
+  grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
   grid_columns: [ content, content, content ]
     
 widgets:
@@ -51,6 +51,62 @@ widgets:
   - label:
       id: ${page_id}_unit_humidity
       text: "%RH"
+      text_font: text_normal
+
+#  # Rain total
+#  - label:
+#      text: "Rain total"
+#      text_font: text_normal
+#  - label:
+#      id: ${page_id}_value_rain_total
+#      grid_cell_x_align: END
+#      text: "--"
+#      text_font: text_bold
+#  - label:
+#      id: ${page_id}_unit_rain_total
+#      text: "mm"
+#      text_font: text_normal
+
+  # Rain 5min
+  - label:
+      text: "Rain 5min"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_rain_5min
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_rain_5min
+      text: "mm"
+      text_font: text_normal
+
+  # Rain 1h
+  - label:
+      text: "Rain 1h"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_rain_1h
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_rain_1h
+      text: "mm"
+      text_font: text_normal
+
+  # Rain 24h
+  - label:
+      text: "Rain 24h"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_rain_24h
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_rain_24h
+      text: "mm"
       text_font: text_normal
 
   # Wind speed m/s
