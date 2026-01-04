@@ -12,7 +12,12 @@ Application
     [ ] Send data to WoW (HTTP post)
     [ ] Send data to OpenWeatherMap (HTTP post)
 
+[ ] Arlec switch/power-monitor
 [ ] Garage door controller
+
+UI
+==
+[ ] UI framework: LVGL or ESPHome basic
 
 [ ] Font selection
     [ ] M5Stick C
@@ -36,6 +41,7 @@ ESPHome
 
 [ ] LVGL UI design
     [X] Right-align values
+    [ ] Parameter display row
 
 [ ] Use display to show Home Assistant data, rather than (or as well as) ESPHome internals
 [ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall

@@ -50,7 +50,7 @@ sensor:
       name: "LPS22 temperature"
       on_value:
         - lvgl.label.update:
-            id: page_wx_temperature_in
+            id: page_wx_value_temperature_in
             text:
               format: "%.1f"
               args:
@@ -59,7 +59,7 @@ sensor:
       name: "LPS22 pressure"
       on_value:
         - lvgl.label.update:
-            id: page_wx_pressure
+            id: page_wx_value_pressure
             text:
               format: "%.1f"
               args:
@@ -72,7 +72,7 @@ sensor:
     icon: "mdi:thermometer" 
     on_value:
       - lvgl.label.update:
-          id: page_wx_temperature
+          id: page_wx_value_temperature
           text:
             format: "%.1f"
             args:
@@ -146,74 +146,11 @@ lvgl:
   displays:
     - lcd_A
   pages:
-    - id: page_wx
-      layout:
-        type: grid
-        grid_rows: [ content, content, content, content ]
-        grid_columns: [ content, content, content ]
-      widgets:
-        - label:
-            grid_cell_row_pos: 0
-            grid_cell_column_pos: 0
-            grid_cell_column_span: 3
-            text: "Weather"
-            text_font: heading
-
-        - label:
-            grid_cell_row_pos: 1
-            grid_cell_column_pos: 0
-            text: "Temperature"
-            text_font: text_normal
-        - label:
-            id: page_wx_temperature
-            grid_cell_row_pos: 1
-            grid_cell_column_pos: 1
-            grid_cell_x_align: END
-            text: "--"
-            text_font: text_bold
-        - label:
-            grid_cell_row_pos: 1
-            grid_cell_column_pos: 2
-            text: "°C"
-            text_font: text_normal
-
-        - label:
-            grid_cell_row_pos: 2
-            grid_cell_column_pos: 0
-            text: "Pressure"
-            text_font: text_normal
-        - label:
-            id: page_wx_pressure
-            grid_cell_row_pos: 2
-            grid_cell_column_pos: 1
-            grid_cell_x_align: END
-            text: "--"
-            text_font: text_bold
-        - label:
-            id: page_wx_pressure_unit
-            grid_cell_row_pos: 2
-            grid_cell_column_pos: 2
-            text: "hPa"
-            text_font: text_normal
-
-        - label:
-            grid_cell_row_pos: 3
-            grid_cell_column_pos: 0
-            text: "Temperature in"
-            text_font: text_normal
-        - label:
-            id: page_wx_temperature_in
-            grid_cell_row_pos: 3
-            grid_cell_column_pos: 1
-            grid_cell_x_align: END
-            text: "--"
-            text_font: text_bold
-        - label:
-            id: page_wx_temperature_in_unit
-            grid_cell_row_pos: 3
-            grid_cell_column_pos: 2
-            text: "°C"
-            text_font: text_normal
+    - !include
+        file: page_wx.yaml
+        vars:
+          page_id: page_wx
+          page_title: "Weather"
 
 
 font:

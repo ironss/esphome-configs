@@ -1,0 +1,75 @@
+id: page_wx
+layout:
+  type: grid
+  grid_rows: [ content, content, content, content ]
+  grid_columns: [ content, content, content ]
+    
+widgets:
+  # Title
+  - label:
+      grid_cell_row_pos: 0
+      grid_cell_column_pos: 0
+      grid_cell_column_span: 3
+      text: ${page_title}
+      text_font: heading
+
+  # Row 1 - Temperature
+  - label:
+      grid_cell_row_pos: 1
+      grid_cell_column_pos: 0
+      text: "Temperature"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_temperature
+      grid_cell_row_pos: 1
+      grid_cell_column_pos: 1
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_temperature
+      grid_cell_row_pos: 1
+      grid_cell_column_pos: 2
+      text: "°C"
+      text_font: text_normal
+
+  # Row 2 - Pressure
+  - label:
+      grid_cell_row_pos: 2
+      grid_cell_column_pos: 0
+      text: "Pressure"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_pressure
+      grid_cell_row_pos: 2
+      grid_cell_column_pos: 1
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_pressure
+      grid_cell_row_pos: 2
+      grid_cell_column_pos: 2
+      text: "hPa"
+      text_font: text_normal
+
+  # Row 3 - Temperature inside
+  - label:
+      grid_cell_row_pos: 3
+      grid_cell_column_pos: 0
+      text: "Temperature in"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_temperature_in
+      grid_cell_row_pos: 3
+      grid_cell_column_pos: 1
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_temperature_in
+      grid_cell_row_pos: 3
+      grid_cell_column_pos: 2
+      text: "°C"
+      text_font: text_normal
+
