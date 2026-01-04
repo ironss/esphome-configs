@@ -83,6 +83,13 @@ sensor:
     id: wx_humidity
     unit_of_measurement: "%RH"
     icon: "mdi:water-percent"
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_humidity
+          text:
+            format: "%.1f"
+            args:
+              - x
     
   - platform: template
     name: "WX rain"
@@ -101,6 +108,19 @@ sensor:
     id: wx_wind_avg
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_wind_speed_m_s
+          text:
+            format: "%.1f"
+            args:
+              - x
+      - lvgl.label.update:
+          id: page_wx_value_wind_speed_kn
+          text:
+            format: "%.1f"
+            args:
+              - !lambda x * 1.944
 
   - platform: template
     name: "WX wind max"
