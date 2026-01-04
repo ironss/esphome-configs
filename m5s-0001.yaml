@@ -127,6 +127,16 @@ sensor:
     id: wx_wind_max
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
+
+  - platform: template
+    name: "WX wind vector N"
+    id: wx_wind_n
+    unit_of_measurement: ""
+    
+  - platform: template
+    name: "WX wind vector E"
+    id: wx_wind_e
+    unit_of_measurement: ""
         
 
 sx127x:
@@ -159,6 +169,8 @@ rtl_433:
             id(wx_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
             id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
             id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
+            id(wx_wind_n).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
+            id(wx_wind_e).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
           }
 
 
