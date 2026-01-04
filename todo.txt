@@ -1,27 +1,24 @@
 TODO
 ####
 
-Applications
-============
+Application
+===========
+
 [ ] 433 MHz weather station receiver
-    [ ] Connect 433 MHz receiver to ESPHome device
     [X] Use 433 MHz SX1275 (LoRa chip)
-    [X] Decode weather station data
-    [X] Make data available as input value for Home Assistant
     [ ] Remove unwanted decoders from RTL-433 to speed it up
-    [X] Display data on LCD
+    [ ] Use macros (or something) to simplify LVGL UI definition
     [ ] Send data to Thingsboard (MQTT publish)
     [ ] Send data to WoW (HTTP post)
     [ ] Send data to OpenWeatherMap (HTTP post)
 
-[ ] IR controller for heatpump
+[ ] Garage door controller
 
-[ ] Bus arrival times from Google
-    [ ] Shown on remote display
+[ ] Font selection
+    [ ] M5Stick C
+    [ ] M5Stack
 
-[ ] Weather forecast on remote display
-
-
+    
 ESPHome
 =======
 
@@ -43,9 +40,15 @@ ESPHome
 [ ] Use display to show Home Assistant data, rather than (or as well as) ESPHome internals
 [ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
     
+[ ] OTA
+    [ ] Test it
+    [ ] Find out how to restrict what can be uploaded
+        [ ] Hardware models
+        [ ] Applications allowed on the device
 
-Hardware
-========
+
+ESP32 devices
+=============
 
 [ ] M5Stick-C
     [X] Higher download speed: M5Stick-C supports 500 MHz
@@ -62,28 +65,26 @@ Hardware
     [X] Create an example diagnostics page
     [ ] Use MIPI SPI display driver rather than ST7735
 
-[ ] Configuration for M5Stack Core
+[ ] M5Stack Core Basic
     [X] Basic config
     [X] Display config
     [X] Buttons
-    [X] LoRa 433 MHz module
-    [ ] GNSS module
-    [ ] BMP180 module
-    [X] LPS25HW module
-    [X] OOK decoder
-    [X] RTL_433 decoder
     [X] Fonts
     [X] Backlight seems a bit dim -- probably a hardware problem
 
-[ ] Configuration for M5Knob
-    [ ] Basic config
-    [ ] Display
-    [ ] Dial
-    [ ] Button
+[ ] M5Knob
 
-[ ] OTA
-    [ ] Test it
-    [ ] Find out how to restrict what can be uploaded
-        [ ] Hardware models
-        [ ] Applications allowed on the device
+[ ] CB2S (Arlec switch/power-meter)
+
+[ ] 
+
+Sensor hardware devices
+=======================
+
+[X] LoRa 433 MHz module
+[ ] GNSS module
+[ ] BMP180 module
+[X] LPS25HW module
+[X] OOK decoder
+[X] RTL_433 decoder
 
