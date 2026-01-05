@@ -1,0 +1,22 @@
+# Hardware definition for M5Stack LoRa 433 MHz module v1.0 (EOL)
+# * modified to bring out SX127x DIO2 (demodulated OOK/ASK output) to a pin
+
+sx127x:
+  cs_pin: GPIO05
+  rst_pin: GPIO26
+  dio0_pin: GPIO36
+
+  frequency: ${rx_frequency}
+  bandwidth: 50_0kHz
+  modulation: OOK
+  rx_start: true
+  packet_mode: false
+  bitsync: true
+  bitrate: 4800
+  rx_floor: -90
+
+
+remote_receiver:
+  - pin: ${rx_OOK_pin}  # Use for OOK input; driven by SX127x pin DIO2
+    id: ${rx_id}
+
