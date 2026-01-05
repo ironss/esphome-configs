@@ -1,0 +1,18 @@
+# Set of fonts suitable for M5Stack Core Basic
+# * 320x240 pixel
+# * 2" diagonal
+# * 190 dpi
+
+font:
+  - file: "fonts/bdf/75dpi/helvR14.bdf"
+    id: text_normal
+
+  - file: "fonts/bdf/75dpi/helvB14.bdf"
+    id: text_bold
+
+  - file: "fonts/bdf/75dpi/helvB18.bdf"
+    id: heading
+
+  - file: "fonts/bdf/75dpi/helvR10.bdf"
+    id: text_tiny
+

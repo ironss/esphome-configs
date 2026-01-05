@@ -1,0 +1,107 @@
+esphome:
+  name: sw-0002
+
+bk72xx:
+  board: cb2s
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  networks:
+    - ssid: "ioSphere dev"
+      password: !secret "wifi_psk_ioSphere dev"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "sw-0002 AP"
+    password: "7Ub86vv0vDOV"
+
+captive_portal:
+
+
+substitutions:
+  bl0937_voltage_divider: "750"
+  bl0937_current_resistor: "0.0025 ohm"
+
+# The main relay is connected to P26
+switch:
+  - platform: gpio
+    name: Socket
+    pin: P8  # was P26 on series 2
+    id: socket1
+    on_turn_on:
+      then:
+        light.turn_on: led1
+    on_turn_off: 
+      then:
+        light.turn_off: led1
+
+# The button on the side of the socket is wired to P11
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: P11
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: Button
+    on_click:
+      min_length: 50ms
+      then:
+        switch.toggle: socket1
+
+# The LED is directly controlled via the state of the relay with the switch above
+light:
+  - platform: binary
+    name: "LED"
+    id: led1
+    output: light_output
+    internal: true
+
+output:
+  - id: light_output
+    platform: gpio
+    inverted: false  # was 'true' on Series 2
+    pin: P26   # was P8 on Series 2
+
+# The pins were checked with a multimeter and the datasheet for the built in BL0937.
+sensor:
+  - platform: uptime
+    name: Uptime
+  - platform: internal_temperature
+    name: "Internal Temperature"
+  - platform: hlw8012
+    model: BL0937
+    cf_pin:
+      number: P7
+      inverted: true
+    cf1_pin:
+      number: P6
+      inverted: true
+    sel_pin:
+      number: P24
+      inverted: true
+    current:
+      name: BL0937 Current
+    voltage:
+      name: BL0937 Voltage
+    power:
+      name: BL0937 Power
+    energy:
+      name: BL0937 Energy
+    voltage_divider: $bl0937_voltage_divider
+    current_resistor: $bl0937_current_resistor
+    update_interval: 15s
+    change_mode_every: 4
+

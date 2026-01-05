@@ -35,6 +35,10 @@ packages:
       rx_id: rx_A
       wx_tx_model: "Fineoffset-WHx080"
       wx_tx_id: 87
+      
+  fonts: !include
+    file: fonts-m5stack.yaml
+    
 
 esp32:
   board: m5stack-core-esp32
@@ -183,18 +187,4 @@ lvgl:
         vars:
           page_id: page_wx
           page_title: "Weather"
-
-
-font:
-  - file: "fonts/bdf/75dpi/helvR14.bdf"
-    id: text_normal
-
-  - file: "fonts/bdf/75dpi/helvB14.bdf"
-    id: text_bold
-
-  - file: "fonts/bdf/75dpi/helvB18.bdf"
-    id: heading
-
-  - file: "fonts/bdf/75dpi/helvR10.bdf"
-    id: text_tiny
 
