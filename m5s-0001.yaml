@@ -111,7 +111,7 @@ sensor:
 #              - x
 
   - platform: template
-    name: "WX rain 05min"
+    name: "WX rain 5min"
     id: wx_rain_5min
     accuracy_decimals: 1
     unit_of_measurement: "mm"
@@ -120,13 +120,13 @@ sensor:
       - heartbeat: 30s
       - delay_delta:
           window_size: 10
-    on_value:
-      - lvgl.label.update:
-          id: page_wx_value_rain_5min
-          text:
-            format: "%.1f"
-            args:
-              - x
+#    on_value:
+#      - lvgl.label.update:
+#          id: page_wx_value_rain_5min
+#          text:
+#            format: "%.1f"
+#            args:
+#              - x
 
   - platform: template
     name: "WX rain 1h"
@@ -172,7 +172,7 @@ sensor:
     icon: "mdi:compass"
     
   - platform: template
-    name: "WX wind average"
+    name: "WX wind speed average"
     id: wx_wind_avg
     accuracy_decimals: 1
     unit_of_measurement: "m.s-1"
@@ -192,31 +192,31 @@ sensor:
               - !lambda x * 1.944
 
   - platform: template
-    name: "WX wind max"
+    name: "WX wind speed max"
     id: wx_wind_max
     accuracy_decimals: 1
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
 
   - platform: template
-    name: "WX wind vector N smooth"
     id: wx_wind_n_smooth
+    internal: true
     accuracy_decimals: 3
     unit_of_measurement: ""
     filters:
       exponential_moving_average:
-        alpha: 0.1
+        alpha: 0.05
         send_every: 1
         send_first_at: 1
             
   - platform: template
-    name: "WX wind vector E smooth"
     id: wx_wind_e_smooth
+    internal: true
     accuracy_decimals: 3
     unit_of_measurement: ""
     filters:
       exponential_moving_average:
-        alpha: 0.1
+        alpha: 0.05
         send_every: 1
         send_first_at: 1
     
@@ -225,9 +225,20 @@ sensor:
     id: wx_wind_dir_smooth
     accuracy_decimals: 1
     unit_of_measurement: "°"
+    icon: "mdi:compass"
     lambda: |-
-      return -std::atan2(id(wx_wind_n_smooth).state, id(wx_wind_e_smooth).state) * 360 / 2 / std::numbers::pi;
+      float dir = -std::atan2(id(wx_wind_n_smooth).state, id(wx_wind_e_smooth).state) * 360 / 2 / std::numbers::pi;
+      return std::fmod(dir + 360, 360);
     update_interval: 60s
+    filters:
+      - filter_out: NAN
+    on_value:
+      - lvgl.label.update:
+          id: page_wx_value_wind_dir
+          text:
+            format: "%.1f"
+            args:
+              - x
         
 
 sx127x:

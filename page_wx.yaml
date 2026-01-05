@@ -67,19 +67,19 @@ widgets:
 #      text: "mm"
 #      text_font: text_normal
 
-  # Rain 5min
-  - label:
-      text: "Rain 5min"
-      text_font: text_normal
-  - label:
-      id: ${page_id}_value_rain_5min
-      grid_cell_x_align: END
-      text: "--"
-      text_font: text_bold
-  - label:
-      id: ${page_id}_unit_rain_5min
-      text: "mm"
-      text_font: text_normal
+#  # Rain 5min
+#  - label:
+#      text: "Rain 5min"
+#      text_font: text_normal
+#  - label:
+#      id: ${page_id}_value_rain_5min
+#      grid_cell_x_align: END
+#      text: "--"
+#      text_font: text_bold
+#  - label:
+#      id: ${page_id}_unit_rain_5min
+#      text: "mm"
+#      text_font: text_normal
 
   # Rain 1h
   - label:
@@ -135,6 +135,20 @@ widgets:
   - label:
       id: ${page_id}_unit_wind_speed_kn
       text: "kn"
+      text_font: text_normal
+
+  # Wind direction
+  - label:
+      text: "Wind direction"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_wind_dir
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_wind_dir
+      text: "°"
       text_font: text_normal
 
   # Temperature inside
