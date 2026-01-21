@@ -22,7 +22,7 @@ widgets:
       text_font: text_bold
   - label:
       id: ${page_id}_unit_state
-#      text: "."
+      text: " "
       text_font: text_normal
 
   - label:
@@ -35,7 +35,7 @@ widgets:
       text_font: text_bold
   - label:
       id: ${page_id}_unit_ssid
-#      text: ""
+      text: " "
       text_font: text_normal
 
   - label:
@@ -61,6 +61,6 @@ widgets:
       text_font: text_bold
   - label:
       id: ${page_id}_unit_ipaddr
-#      text: ""
+      text: " "
       text_font: text_normal
 

@@ -85,13 +85,13 @@ wifi:
           text: "Disconnected"
       - lvgl.label.update:
           id: page_wifi_value_ssid
-          text: "--"
+          text: " "
       - lvgl.label.update:
           id: page_wifi_value_rssi
           text: "--"
       - lvgl.label.update:
           id: page_wifi_value_ipaddr
-          text: "--"
+          text: " "
 
 
 text_sensor:
