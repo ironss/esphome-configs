@@ -5,15 +5,14 @@
 # * Viewing distance: 300 mm
 
 font:
-  - file: "fonts/bdf/75dpi/helvR14.bdf"
+  - file: "fonts/X11/75dpi/helvR14.bdf"
     id: text_normal
 
-  - file: "fonts/bdf/75dpi/helvB14.bdf"
+  - file: "fonts/X11/75dpi/helvB14.bdf"
     id: text_bold
 
-  - file: "fonts/bdf/75dpi/helvB18.bdf"
+  - file: "fonts/X11/75dpi/helvB18.bdf"
     id: heading
 
-  - file: "fonts/bdf/75dpi/helvR10.bdf"
+  - file: "fonts/X11/75dpi/helvR10.bdf"
     id: text_tiny
-

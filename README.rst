@@ -11,13 +11,13 @@ Usage
 
 * Checkout the config repository
     * git checkout git@github.com-private:ironss/esphome-configs.git
-    
+
 * Use the config repository
     * cd esphome-configs
     * source ../esphome-dev/venv/bin/activate
     * esphome run <config.yaml> --device /dev/serial/by-id/usb-<device>
 
-    
+
 Config-file structure
 =====================
 * Individual configuration file
@@ -26,8 +26,8 @@ Config-file structure
     * Keys
     * etc
     * application-specific limits, etc
-    
-* Application configuration file 
+
+* Application configuration file
 * Hardware configuration file
 
 
@@ -42,7 +42,7 @@ Applications
         * LPS22 or LPS25
         * BMP105 or similar
     * Display
-    
+
 * IR heat-pump controller
 * Garage door controller/monitor
 
@@ -137,24 +137,42 @@ Fonts
         * Values: standard size, bold, with fixed-width digits and decimal point for easy alignment
         * Log data: tiny, fixed-width font
         * Descriptive text: tiny, proporational font
+
 * Suggestions
     * At low resolution, avoid serif fonts
     * Use X11 bitmap fonts: scalable fonts don't work well at 1BPP
         * Alternative, use 4BPP, but this makes the rasterised fonts much bigger
-    
+    * Use X11 75 dpi fonts: then pixel-size ~ point-size
+
 * Font sources
     * X11 bitmap fonts (75dpi gives pixel-size ~ point-size)
+        * Marcus Kuhn originals Unicode versions
+        * Linux /usr/share/fonts/X11
     * TTF/OTF fonts
 
 * M5 Stick C
     * LCD: 160x80,  0.96", ~190 dpi
-    * These fonts give a heading row and 4 normal display rows
-        * Text normal: X11/75dpi/helvR10.bdf
-        * Text bold: X11/75dpi/helvB10.bdf
-        * Heading: X11/75dpi/helvB12.bdf
-        * Text tiny: X11/75dpi/helvR08.bdf
-        * Text log: misc/5x8.pcf.gz
+    * These fonts give a heading row and 4 normal display rows of about ? characters
+        * Text normal: fonts/X11/75dpi/helvR10.bdf
+        * Text bold: fonts/X11/75dpi/helvB10.bdf
+        * Heading: fonts/X11/75dpi/helvB12.bdf
+        * Text tiny: fonts/X11/75dpi/helvR08.bdf
+        * Text log: fonts/X11/misc/5x8.pcf.gz
 
 * M5 Stack Core Basic
     * LCD: 320x240, 2", ~190 dpi
+    * These fonts give a heading row, and ? normal display rows of about ? characters
+        * Text normal: fonts/X11/75dpi/helvR14.bdf
+        * Text bold: fonts/X11/75dpi/helvB14.bdf
+        * Heading: fonts/X11/75dpi/helvB18.bdf
+        * Text tiny: fonts/X11/75dpi/helvR10.bdf
+        * Text log: fonts/X11/misc/6x10.pcf.gz
 
+* Notes
+    * The 'fonts' directory is ignored in .gitignore. This is so that
+        * You can have fonts there that you don't actually use
+        * You have a clean 'git status'
+    * If you need a font
+        * Put it in the fonts directory
+        * Verify that it works
+        * Add it to version control, using '-f' to override the ignore.
