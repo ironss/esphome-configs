@@ -3,7 +3,7 @@ layout:
   type: grid
   grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
   grid_columns: [ content, content, content ]
-    
+
 widgets:
   # Title
   - label:
@@ -164,4 +164,3 @@ widgets:
       id: ${page_id}_unit_temperature_in
       text: "°C"
       text_font: text_normal
-
