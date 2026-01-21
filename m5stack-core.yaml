@@ -1,3 +1,5 @@
+# Configuration for M5Stack Core Basic
+
 binary_sensor:
   - platform: gpio
     pin:
@@ -5,13 +7,6 @@ binary_sensor:
       inverted: true
     name: Button A
     id: btn_A
-    on_press:
-      then:
-        - output.turn_on:
-            id: lcd_bl
-        - output.set_level:
-            id: lcd_bl
-            level: 100%
 
   - platform: gpio
     pin:
@@ -19,13 +14,6 @@ binary_sensor:
       inverted: true
     name: Button B
     id: btn_B
-    on_press:
-      then:
-        - output.turn_on:
-            id: lcd_bl
-        - output.set_level:
-            id: lcd_bl
-            level: 50%
 
   - platform: gpio
     pin:
@@ -33,10 +21,6 @@ binary_sensor:
       inverted: true
     name: Button C
     id: btn_C
-    on_press:
-      then:
-        - output.turn_off:
-            id: lcd_bl
 
 
 output:
@@ -66,7 +50,7 @@ display:
     cs_pin: GPIO14
     dc_pin: GPIO27
     data_rate: 40MHz
-    invert_colors: true
+    invert_colors: ${invert_colors}
     pixel_mode: 16bit
     dimensions:
       width: 320

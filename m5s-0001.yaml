@@ -11,6 +11,8 @@ esphome:
 packages:
   core_hw: !include 
     file: m5stack-core.yaml
+    vars:
+      invert_colors: true
 
   lps_hw: !include
     file: lps22.yaml
@@ -69,6 +71,53 @@ wifi:
         
     - ssid: "wodexitose"
       password: !secret "wifi_psk_wodexitose"
+
+  on_connect:
+    then:
+      - lvgl.label.update:
+          id: page_wifi_value_state
+          text: "Connected"
+
+  on_disconnect:
+    then:
+      - lvgl.label.update:
+          id: page_wifi_value_state
+          text: "Disconnected"
+      - lvgl.label.update:
+          id: page_wifi_value_ssid
+          text: "--"
+      - lvgl.label.update:
+          id: page_wifi_value_rssi
+          text: "--"
+      - lvgl.label.update:
+          id: page_wifi_value_ipaddr
+          text: "--"
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ipaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+    ssid:
+      name: "SSID"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ssid
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+    mac_address:
+      name: "MAC"
 
 
 sensor:
@@ -177,6 +226,26 @@ sensor:
             args:
               - x
 
+  # Wi-Fi
+  - platform: wifi_signal
+    name: "WiFi signal sensor"
+    update_interval: 10s
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_wifi_value_rssi
+            text:
+              format: "%.1f"
+              args:
+                - x
+
+
+binary_sensor:
+  - id: !extend btn_C
+    on_press:
+      then:
+        - lvgl.page.next:
+
 
 lvgl:
   displays:
@@ -187,4 +256,10 @@ lvgl:
         vars:
           page_id: page_wx
           page_title: "Weather"
+
+    - !include
+        file: page_wifi.yaml
+        vars:
+          page_id: page_wifi
+          page_title: "Wi-Fi"
 

@@ -11,6 +11,8 @@ esphome:
 packages:
   core_hw: !include 
     file: m5stack-core.yaml
+    vars:
+      invert_colors: false
 
   fonts: !include
     file: fonts-m5stack.yaml
@@ -70,7 +72,7 @@ wifi:
 sensor:
   - platform: wifi_signal
     name: "WiFi signal sensor"
-    update_interval: 10s
+    update_interval: 30s
     on_value:
       then: 
         - lvgl.label.update:
@@ -114,6 +116,4 @@ lvgl:
         vars:
           page_id: page_wifi
           page_title: "Wi-Fi"
-
-
 

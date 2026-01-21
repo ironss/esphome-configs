@@ -3,7 +3,7 @@ layout:
   type: grid
   grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
   grid_columns: [ content, content, content ]
-    
+
 widgets:
   # Title
   - label:
