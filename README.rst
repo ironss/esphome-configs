@@ -18,6 +18,19 @@ Usage
     * esphome run <config.yaml> --device /dev/serial/by-id/usb-<device>
 
     
+Config-file structure
+=====================
+* Individual configuration file
+    * Name
+    * Serial number
+    * Keys
+    * etc
+    * application-specific limits, etc
+    
+* Application configuration file 
+* Hardware configuration file
+
+
 Applications
 ============
 
@@ -48,6 +61,20 @@ Hardware devices
 * Heltec ESP32 LoRa module
 * NodeMCU or bare AIThinker ESP8266MOD
 * CB2S (Arlec switch/power-monitor)
+
+
+M5Stack Core variants
+---------------------
+* Display variant
+    * TFT LCD
+    * IPS display (inverted)
+* Flash variants, something like
+    * 1 M
+    * 4 M
+    * 16 M
+* There was something different about some old version: GPIO25 perhaps
+* Different power-supply management chip, some had no I2C access
+* Different IMU
 
 
 433 MHz weather station decoder
