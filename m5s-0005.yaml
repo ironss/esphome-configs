@@ -1,0 +1,119 @@
+esphome:
+  name: m5s-0005
+  on_boot:
+    then:
+      - output.turn_on:
+          id: lcd_bl
+      - output.set_level:
+          id: lcd_bl
+          level: 100%
+
+packages:
+  core_hw: !include 
+    file: m5stack-core.yaml
+
+  fonts: !include
+    file: fonts-m5stack.yaml
+    
+
+esp32:
+  board: m5stack-core-esp32
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+
+wifi:
+  networks:
+    - ssid: "ioSphere dev"
+      password: !secret "wifi_psk_ioSphere dev"
+#      manual_ip:
+#        static_ip: 192.168.1.161
+#        gateway: 192.168.1.1
+#        subnet: 255.255.255.0
+        
+    - ssid: "wodexitose"
+      password: !secret "wifi_psk_wodexitose"
+
+  on_connect:
+    then:
+      - lvgl.label.update:
+          id: page_wifi_value_state
+          text: "Connected"
+
+  on_disconnect:
+    then:
+      - lvgl.label.update:
+          id: page_wifi_value_state
+          text: "Disconnected"
+      - lvgl.label.update:
+          id: page_wifi_value_ssid
+          text: "--"
+      - lvgl.label.update:
+          id: page_wifi_value_rssi
+          text: "--"
+      - lvgl.label.update:
+          id: page_wifi_value_ipaddr
+          text: "--"
+      
+sensor:
+  - platform: wifi_signal
+    name: "WiFi signal sensor"
+    update_interval: 10s
+    on_value:
+      then: 
+        - lvgl.label.update:
+            id: page_wifi_value_rssi
+            text:
+              format: "%.1f"
+              args:
+                - x
+      
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ipaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+    ssid:
+      name: "SSID"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ssid
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()        
+    mac_address:
+      name: "MAC"
+      
+lvgl:
+  displays:
+    - lcd_A
+  pages:
+    - !include
+        file: page_wifi.yaml
+        vars:
+          page_id: page_wifi
+          page_title: "Wi-Fi"
+
+
+

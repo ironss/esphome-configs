@@ -1,0 +1,66 @@
+id: page_wifi
+layout:
+  type: grid
+  grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
+  grid_columns: [ content, content, content ]
+    
+widgets:
+  # Title
+  - label:
+      grid_cell_column_span: 3
+      text: ${page_title}
+      text_font: heading
+
+  # Wi-Fi
+  - label:
+      text: "State"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_state
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_state
+#      text: "."
+      text_font: text_normal
+
+  - label:
+      text: "SSID"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_ssid
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_ssid
+#      text: ""
+      text_font: text_normal
+
+  - label:
+      text: "RSSI"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_rssi
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_rssi
+      text: "dBm"
+      text_font: text_normal
+
+  - label:
+      text: "IP"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_ipaddr
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_ipaddr
+#      text: ""
+      text_font: text_normal
+
