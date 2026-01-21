@@ -1,7 +1,23 @@
 ESPHome notes
 #############
 
+Usage
+=====
+* Set up ESPHome development fork in esphome-dev
+    * git checkout git@github.com-private:ironss/esphome-dev.git
+    * cd esphome-dev
+    * script/setup
+    * cd ..
 
+* Checkout the config repository
+    * git checkout git@github.com-private:ironss/esphome-configs.git
+    
+* Use the config repository
+    * cd esphome-configs
+    * source ../esphome-dev/venv/bin/activate
+    * esphome run <config.yaml> --device /dev/serial/by-id/usb-<device>
+
+    
 Applications
 ============
 
