@@ -42,7 +42,7 @@ switch:
     on_turn_on:
       then:
         light.turn_on: led1
-    on_turn_off: 
+    on_turn_off:
       then:
         light.turn_off: led1
 
@@ -79,8 +79,10 @@ output:
 sensor:
   - platform: uptime
     name: Uptime
+
   - platform: internal_temperature
     name: "Internal Temperature"
+
   - platform: hlw8012
     model: BL0937
     cf_pin:
