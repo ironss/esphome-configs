@@ -22,15 +22,16 @@ ota:
     password: !secret ota_password
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_psk
+  ssid: !secret wifi1_ssid
+  password: !secret wifi1_psk
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: !secret ap_ssid
-    password: !secret ap_psk
+#  # Enable fallback hotspot (captive portal) in case wifi connection fails
+#  ap:
+#    ssid: !secret ap_ssid
+#    password: !secret ap_psk
 
 captive_portal:
+
 
 light:
   - platform: monochromatic
@@ -92,11 +93,11 @@ display:
     pages:
       - id: page_1
         lambda: |-
-          it.print(0, 10, id(roboto_12), "Page 1");
+          it.print(0, 10, id(text_normal), "Page 1");
           
       - id: page_2
         lambda: |-
-          it.print(0, 10, id(roboto_12), "Page 2");
+          it.print(0, 10, id(text_normal), "Page 2");
          
 
 interval:
@@ -105,13 +106,24 @@ interval:
       - display.page.show_next: disp_1
       - component.update: disp_1
     
-    
 font:
   - file: "gfonts://Roboto"
-    size: 12
-    id: roboto_12
+    size: 14
+    id: text_normal
 
-
+  - file: "gfonts://Roboto@bold"
+    size: 14
+    id: text_bold
+    
+  - file: "gfonts://Roboto@bold"
+    size: 20
+    id: heading
+    
+  - file: "gfonts://Roboto"
+    size: 10
+    id: text_tiny
+    
+    
 i2c:
   - id: bus_a
     sda: GPIO21
@@ -140,3 +152,16 @@ sensor:
   - platform: uptime
     name: Uptime
 
+
+remote_transmitter:
+  - pin: GPIO09
+    carrier_duty_percent: 50%
+    non_blocking: true
+    id: ir_led
+
+climate:
+  - platform: daikin_arc
+    transmitter_id: ir_led
+    name: AC
+    id: ac_1
+    
