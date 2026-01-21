@@ -1,7 +1,8 @@
-# Set of fonts suitable for M5Stack Core Basic
-# * 320x240 pixel
-# * 2" diagonal
-# * 190 dpi
+# Fonts suitable for M5Stack Core Basic
+# * Pixel size: 320x240 pixel
+# * Physical size: 2" diagonal
+# * Pixel resolution: 190x190 dpi
+# * Viewing distance: 300 mm
 
 font:
   - file: "fonts/bdf/75dpi/helvR14.bdf"
