@@ -45,12 +45,22 @@ rc522_i2c:
     on_tag:
       then:
         - globals.set:
-            id: last_tag
+            id: tag_id
             value: !lambda 'return x;'
+        - globals.set:
+            id: tag_result
+            value: !lambda 'if (x == "2A-71-23-3A") return "OK"; else return "No";'
         - display.page.show: page_scan
         - component.update: disp_1
         - light.turn_on: display_backlight
-        - rtttl.play: "scan-success:d=4,o=5,b=120:32c,32g,32b"
+        - if:
+            condition:
+                lambda: 'return id(tag_result) == "OK";'
+            then:
+              rtttl.play: "scan-allow:d=4,o=5,b=120:32c,32g,32b"
+            else:
+              rtttl.play: "scan-deny:d=4,o=5,b=120:8c4"
+            
         - homeassistant.tag_scanned: !lambda 'return x;'
 
 output:
@@ -138,7 +148,8 @@ display:
       - id: page_scan
         lambda: |-
           it.printf(96, 20, id(heading), TextAlign::BASELINE_LEFT, "Scan");
-          it.printf(96, 35, id(text_normal), TextAlign::BASELINE_LEFT, "%s", id(last_tag).c_str());
+          it.printf(96, 35, id(text_normal), TextAlign::BASELINE_LEFT, "%s", id(tag_id).c_str());
+          it.printf(96, 50, id(text_normal), TextAlign::BASELINE_LEFT, "%s", id(tag_result).c_str());
 
 
 #interval:
@@ -181,9 +192,15 @@ light:
         - light.turn_off: display_backlight
 
 globals:
-  - id: last_tag
+  - id: tag_id
     type: std::string
     restore_value: no
-    max_restore_data_length: 24
-    initial_value: '"asdf"'
+    # max_restore_data_length: 24
+    initial_value: '"---"'
+
+  - id: tag_result
+    type: std::string
+    restore_value: no
+    # max_restore_data_length: 24
+    initial_value: '"--"'
 
