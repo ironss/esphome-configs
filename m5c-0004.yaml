@@ -1,5 +1,5 @@
 esphome:
-  name: m5c-0001
+  name: m5c-0004
   platformio_options:
     upload_speed: 750000
 
