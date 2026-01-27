@@ -1,0 +1,65 @@
+esphome:
+  name: host-160x80
+
+host:
+
+logger:
+
+sensor:
+  - platform: uptime
+    name: Uptime
+    id: uptime_s
+
+
+display:
+  - platform: sdl
+    id: disp_1
+    # show_test_card: true
+    dimensions:
+      width: 160
+      height: 80
+
+    pages:
+      - id: page_diagnostics
+        lambda: |-
+          it.printf(2, 16, id(heading), TextAlign::BASELINE_LEFT, "Diagnostics");
+
+          it.printf(2, 31, id(text_normal), TextAlign::BASELINE_LEFT, "RSSI");
+          it.printf(120, 31, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
+          it.printf(128, 31, id(text_normal), TextAlign::BASELINE_LEFT, "dBm");
+
+          it.printf(2, 46, id(text_normal), TextAlign::BASELINE_LEFT, "Battery");
+          it.printf(120, 46, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
+          it.printf(128, 46, id(text_normal), TextAlign::BASELINE_LEFT, "%%");
+
+          it.printf(2, 61, id(text_normal), TextAlign::BASELINE_LEFT, "Uptime");
+          it.printf(120, 61, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(uptime_s).state/3600);
+          it.printf(128, 61, id(text_normal), TextAlign::BASELINE_LEFT, "h");
+
+          it.printf(2, 76, id(text_normal), TextAlign::BASELINE_LEFT, "Line 4");
+
+      - id: page_wifi
+        lambda: |-
+          it.printf(2, 16, id(heading), TextAlign::BASELINE_LEFT, "Page 2");
+
+
+interval:
+  - interval: 5s
+    then:
+      - display.page.show_next: disp_1
+      - component.update: disp_1
+
+
+font:
+  - file: "fonts/X11/75dpi/helvR10.bdf"
+    id: text_normal
+
+  - file: "fonts/X11/75dpi/helvB10.bdf"
+    id: text_bold
+
+  - file: "fonts/X11/75dpi/helvB12.bdf"
+    id: heading
+
+  - file: "fonts/X11/75dpi/helvR08.bdf"
+    id: text_tiny
+

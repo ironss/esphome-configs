@@ -1,0 +1,12 @@
+esphome:
+  name: host-240x240
+
+host:
+
+display:
+  - platform: sdl
+    show_test_card: true
+    dimensions:
+      width: 240
+      height: 240
+
