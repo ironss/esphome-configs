@@ -1,0 +1,161 @@
+esphome:
+  name: m5c-0003
+  platformio_options:
+    upload_speed: 750000
+
+external_components:
+  # AXP192 power management needed to turn TFT power on
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
+
+esp32:
+  board: m5stick-c
+  framework:
+    # External component axp192 requires arduino framework
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+
+wifi:
+  networks:
+    - ssid: !secret wifi1_ssid
+      password: !secret wifi1_psk
+    - ssid: !secret wifi2_ssid
+      password: !secret wifi2_psk
+
+
+light:
+  - platform: monochromatic
+    output: builtin_led
+    name: LED
+    id: led1
+
+output:
+  - platform: ledc
+    pin: GPIO10
+    inverted: true
+    id: builtin_led
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO37
+      inverted: true
+    name: Button A
+    on_press:
+      then:
+        - light.toggle: led1
+
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: true
+    name: Button B
+    on_press:
+      then:
+        - light.turn_on: led1
+    on_release:
+      then:
+        - light.turn_off: led1
+
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO15
+
+display:
+  - platform: st7735
+    model: "INITR_MINI160X80"
+    reset_pin: GPIO18
+    cs_pin: GPIO5
+    dc_pin: GPIO23
+    rotation: 270
+    device_width: 80
+    device_height: 160
+    col_start: 26
+    row_start: 1
+    use_bgr: true
+    invert_colors: true
+    eight_bit_color: true
+    update_interval: 10s
+
+    id: disp_1
+    pages:
+      - id: page_diagnostics
+        lambda: |-
+          it.printf(2, 16, id(heading), TextAlign::BASELINE_LEFT, "Diagnostics");
+
+          it.printf(2, 31, id(text_normal), TextAlign::BASELINE_LEFT, "RSSI");
+          it.printf(120, 31, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(wifi_dBm).state);
+          it.printf(128, 31, id(text_normal), TextAlign::BASELINE_LEFT, "dBm");
+
+          it.printf(2, 46, id(text_normal), TextAlign::BASELINE_LEFT, "Battery");
+          it.printf(120, 46, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(battery_level_pc).state);
+          it.printf(128, 46, id(text_normal), TextAlign::BASELINE_LEFT, "%%");
+
+          it.printf(2, 61, id(text_normal), TextAlign::BASELINE_LEFT, "Uptime");
+          it.printf(120, 61, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(uptime_s).state/3600);
+          it.printf(128, 61, id(text_normal), TextAlign::BASELINE_LEFT, "h");
+
+          it.printf(2, 76, id(text_normal), TextAlign::BASELINE_LEFT, "Line 4");
+
+      - id: page_wifi
+        lambda: |-
+          it.printf(2, 20, id(heading), TextAlign::BASELINE_LEFT, "Page 2");
+
+
+interval:
+  - interval: 5s
+    then:
+      - display.page.show_next: disp_1
+      - component.update: disp_1
+
+
+font:
+  - file: "fonts/X11/75dpi/helvR10.bdf"
+    id: text_normal
+
+  - file: "fonts/X11/75dpi/helvB10.bdf"
+    id: text_bold
+
+  - file: "fonts/X11/75dpi/helvB12.bdf"
+    id: heading
+
+  - file: "fonts/X11/75dpi/helvR08.bdf"
+    id: text_tiny
+
+
+i2c:
+  - id: bus_a
+    sda: GPIO21
+    scl: GPIO22
+    scan: true
+
+sensor:
+  - platform: axp192
+    model: M5STICKC
+    address: 0x34
+    i2c_id: bus_a
+    update_interval: 30s
+    battery_level:
+      name: "Battery Level"
+      id: "battery_level_pc"
+
+  - platform: wifi_signal
+    name: WiFi Level
+    id: wifi_dBm
+
+  - platform: uptime
+    name: Uptime
+    id: uptime_s
