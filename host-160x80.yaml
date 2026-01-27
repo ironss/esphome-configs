@@ -3,12 +3,30 @@ esphome:
 
 host:
 
+api:
+  encryption:
+    key: !secret api_key
+    # port: 6066
+
 logger:
 
 sensor:
   - platform: uptime
     name: Uptime
     id: uptime_s
+
+binary_sensor:
+  - platform: sdl
+    id: key_1
+    key: SDLK_1
+
+  - platform: sdl
+    id: key_2
+    key: SDLK_2
+
+  - platform: sdl
+    id: key_3
+    key: SDLK_3
 
 
 display:
