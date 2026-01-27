@@ -42,11 +42,17 @@ rc522_i2c:
   - id: nfc_reader
     i2c_id: internal_i2c
     address: 0x28
+    on_tag:
+      then:
+        - rtttl.play: "scan-success:d=4,o=5,b=120:32c,32g,32b"
+        - light.turn_on: display_backlight
+        - homeassistant.tag_scanned: !lambda 'return x;'
 
 output:
   - platform: ledc
     pin: GPIO3
     id: buzzer
+
   - platform: ledc
     pin: GPIO9
     id: backlight_output
@@ -57,6 +63,7 @@ rtttl:
 sensor:
   - platform: rotary_encoder
     id: encoder
+    name: Encoder
     pin_a: GPIO40
     pin_b: GPIO41
 
@@ -67,6 +74,7 @@ time:
     i2c_id: internal_i2c
     address: 0x51
     update_interval: never
+
   - platform: homeassistant
     id: esptime
     on_time_sync:
@@ -78,10 +86,8 @@ binary_sensor:
     name: Button
     id: front_button
     pin: GPIO42
-
-  - platform: gpio
-    name: Hold Button
-    pin: GPIO46
+    filters:
+      - invert:
 
 spi:
   id: spi_bus
@@ -109,5 +115,9 @@ light:
     name: "Backlight"
     output: backlight_output
     id: display_backlight
-    default_transition_length: 0s
+    default_transition_length: 1s
+    on_turn_on:
+      then:
+        - delay: 5s
+        - light.turn_off: display_backlight
 
