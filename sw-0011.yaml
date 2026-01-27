@@ -1,5 +1,5 @@
 esphome:
-  name: sw-0002
+  name: sw-0011
 
 bk72xx:
   board: cb2s
