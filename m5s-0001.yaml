@@ -1,3 +1,6 @@
+substitutions:
+  http_api_key: !secret http_api_key
+
 esphome:
   name: m5s-0001
   on_boot:
@@ -46,6 +49,11 @@ esp32:
   board: m5stack-core-esp32
   framework:
     type: esp-idf
+    sdkconfig_options:
+      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
+
+#     type: arduino
+
 
 # Enable logging
 logger:
@@ -61,13 +69,16 @@ ota:
 
 
 wifi:
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true
+
   networks:
+    - ssid: "wodexisixes-6"
+      password: !secret "wifi_psk_wodexisixes-6"
+
     - ssid: "ioSphere dev"
       password: !secret "wifi_psk_ioSphere dev"
-#      manual_ip:
-#        static_ip: 192.168.1.161
-#        gateway: 192.168.1.1
-#        subnet: 255.255.255.0
         
     - ssid: "wodexitose"
       password: !secret "wifi_psk_wodexitose"
@@ -92,6 +103,32 @@ wifi:
       - lvgl.label.update:
           id: page_wifi_value_ipaddr
           text: " "
+
+debug:
+  update_interval: 10s
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+
+http_request:
+  timeout: 10s
+  watchdog_timeout: 20s
+
+
+#mqtt:
+#  id: mqtt_tb
+#  broker: iot.irons.nz
+#  port: 1883
+#  username: !secret mqtt_tb_token
+#  reboot_timeout: 0s
+#  topic_prefix: null
+#  keepalive: 30s
+#  idf_send_async: true
+#  discovery: false
+#  discover_ip: false
+#  discovery_retain: false
 
 
 text_sensor:
@@ -132,12 +169,47 @@ sensor:
                 - x
     pressure:
       on_value:
-        - lvgl.label.update:
-            id: page_wx_value_pressure
-            text:
-              format: "%.1f"
-              args:
-                - x
+        then:
+          - lvgl.label.update:
+              id: page_wx_value_pressure
+              text:
+                format: "%.1f"
+                args:
+                  - x
+
+          - if:
+              condition:
+                and:
+                  - time.has_time:
+                      id: ha_time
+                  - wifi.connected:
+              then:
+#                - mqtt.publish_json:
+#                    topic: "v1/devices/me/telemetry"
+#                    qos: 1
+#                    payload: |-
+#                      root["ts"] = id(ha_time).now().timestamp * 1000;
+#                      JsonObject values = root["values"].to<JsonObject>();
+#                      values["mqtt_pressure"] = x;
+#                      values["mqtt_other"] = x * 2.0;
+
+                - http_request.post:
+                    url: https://iot.irons.nz/api/v1/${http_api_key}/telemetry
+                    request_headers:
+                      Content-Type: application/json
+                    json: |-
+                      root["ts"] = id(ha_time).now().timestamp * 1000;
+                      JsonObject values = root["values"].to<JsonObject>();
+                      values["http_pressure"] = x;
+                      values["http_other"] = x * 3.0;
+
+#          - lambda: |-
+#              if (id(ha_time).now().is_valid()) {
+#                id(mqtt_tb).publish_json("v1/devices/me/telemetry", [=](JsonObject root) {
+#                  root["ts"] = id(ha_time).now().timestamp * 1000;
+#                  root["values"]["pressure"] = x;
+#                });
+#              };
 
   # WX.A temperature
   - id: !extend wx_A_temperature
@@ -239,6 +311,16 @@ sensor:
               args:
                 - x
 
+  - platform: debug
+    free:
+      name: "Heap free"
+    fragmentation:
+      name: "Heap fragmentation"
+    block:
+      name: "Heap max block"
+    loop_time:
+      name: "Loop time"
+
 
 binary_sensor:
   - id: !extend btn_C
@@ -250,6 +332,7 @@ binary_sensor:
 lvgl:
   displays:
     - lcd_A
+  buffer_size: 8%
   pages:
     - !include
         file: page_wx.yaml
