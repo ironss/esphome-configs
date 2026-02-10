@@ -1,5 +1,13 @@
+# ESPHome configuration for M5S-0001
+# Copyright © Stephen Irons 2026
+
+# Hardware
+# * M5Stack
+# * LoRa433 module, modified with 
+
 substitutions:
-  http_api_key: !secret http_api_key
+  http_api_key1: !secret api_key_wsh_000002
+
 
 esphome:
   name: m5s-0001
@@ -10,6 +18,7 @@ esphome:
       - output.set_level:
           id: lcd_bl
           level: 100%
+
 
 packages:
   core_hw: !include 
@@ -40,6 +49,7 @@ packages:
       rx_id: rx_A
       wx_tx_model: "Fineoffset-WHx080"
       wx_tx_id: 87
+      http_api_key: http_api_key1
       
   fonts: !include
     file: fonts-m5stack.yaml
@@ -49,8 +59,8 @@ esp32:
   board: m5stack-core-esp32
   framework:
     type: esp-idf
-    sdkconfig_options:
-      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
+#    sdkconfig_options:
+#      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
 
 #     type: arduino
 
@@ -58,10 +68,12 @@ esp32:
 # Enable logging
 logger:
 
+
 # Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: !secret api_key_m5s-0001
+
 
 ota:
   - platform: esphome
@@ -104,8 +116,10 @@ wifi:
           id: page_wifi_value_ipaddr
           text: " "
 
+
 debug:
   update_interval: 10s
+
 
 time:
   - platform: homeassistant
@@ -115,20 +129,6 @@ time:
 http_request:
   timeout: 10s
   watchdog_timeout: 20s
-
-
-#mqtt:
-#  id: mqtt_tb
-#  broker: iot.irons.nz
-#  port: 1883
-#  username: !secret mqtt_tb_token
-#  reboot_timeout: 0s
-#  topic_prefix: null
-#  keepalive: 30s
-#  idf_send_async: true
-#  discovery: false
-#  discover_ip: false
-#  discovery_retain: false
 
 
 text_sensor:
@@ -184,32 +184,15 @@ sensor:
                       id: ha_time
                   - wifi.connected:
               then:
-#                - mqtt.publish_json:
-#                    topic: "v1/devices/me/telemetry"
-#                    qos: 1
-#                    payload: |-
-#                      root["ts"] = id(ha_time).now().timestamp * 1000;
-#                      JsonObject values = root["values"].to<JsonObject>();
-#                      values["mqtt_pressure"] = x;
-#                      values["mqtt_other"] = x * 2.0;
-
                 - http_request.post:
-                    url: https://iot.irons.nz/api/v1/${http_api_key}/telemetry
+                    url: https://iot.irons.nz/api/v1/${http_api_key1}/telemetry
                     request_headers:
                       Content-Type: application/json
                     json: |-
                       root["ts"] = id(ha_time).now().timestamp * 1000;
                       JsonObject values = root["values"].to<JsonObject>();
                       values["http_pressure"] = x;
-                      values["http_other"] = x * 3.0;
 
-#          - lambda: |-
-#              if (id(ha_time).now().is_valid()) {
-#                id(mqtt_tb).publish_json("v1/devices/me/telemetry", [=](JsonObject root) {
-#                  root["ts"] = id(ha_time).now().timestamp * 1000;
-#                  root["values"]["pressure"] = x;
-#                });
-#              };
 
   # WX.A temperature
   - id: !extend wx_A_temperature

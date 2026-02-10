@@ -1,5 +1,9 @@
+# ESPHome hardware definition module
+# Copyright © Stephen Irons 2026
+
 # Hardware definition for M5Stack LoRa 433 MHz module v1.0 (EOL)
 # * modified to bring out SX127x DIO2 (demodulated OOK/ASK output) to a pin
+
 
 sx127x:
   cs_pin: GPIO05

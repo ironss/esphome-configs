@@ -1,4 +1,13 @@
-# Application definition
+# ESPHome application definition
+# Copyright © Stephen Irons 2026
+
+# Uses rtl-433 component
+# * Receives 433 MHz data from weather module
+# * Decodes to JSON
+# * Publishes various JSON object values to 'sensors'
+# * Re-encodes JSON to Thingsboard format with timestamp and multiple values
+# * Posts re-encoded JSON to Thingsboard
+
 
 packages:
   rtl_433: github://juanboro/esphome-rtl_433-decoder/rtl_433.yaml
@@ -10,20 +19,45 @@ rtl_433:
 
   on_json_message:
     then:
-      - lambda: |-
-          if ((x["model"] == "${wx_tx_model}") && (x["id"].as<int>() == ${wx_tx_id})) {
-            id(${wx_id}_temperature).publish_state(x["temperature_C"].as<float>());
-            id(${wx_id}_humidity).publish_state(x["humidity"].as<float>());
-            id(${wx_id}_rain_total).publish_state(x["rain_mm"].as<float>());
-            id(${wx_id}_rain_5min).publish_state(x["rain_mm"].as<float>());
-            id(${wx_id}_rain_1h).publish_state(x["rain_mm"].as<float>());
-            id(${wx_id}_rain_24h).publish_state(x["rain_mm"].as<float>());
-            id(${wx_id}_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
-            id(${wx_id}_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
-            id(${wx_id}_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
-            id(${wx_id}_wind_n_smooth).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
-            id(${wx_id}_wind_e_smooth).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
-          }
+      - if: 
+          condition:
+            lambda: |-
+              return (x["model"] == "${wx_tx_model}") && (x["id"].as<int>() == ${wx_tx_id});
+          then:
+            - lambda: |-
+                id(${wx_id}_temperature).publish_state(x["temperature_C"].as<float>());
+                id(${wx_id}_humidity).publish_state(x["humidity"].as<float>());
+                id(${wx_id}_rain_total).publish_state(x["rain_mm"].as<float>());
+                id(${wx_id}_rain_5min).publish_state(x["rain_mm"].as<float>());
+                id(${wx_id}_rain_1h).publish_state(x["rain_mm"].as<float>());
+                id(${wx_id}_rain_24h).publish_state(x["rain_mm"].as<float>());
+                id(${wx_id}_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
+                id(${wx_id}_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
+                id(${wx_id}_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
+                id(${wx_id}_wind_n_smooth).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
+                id(${wx_id}_wind_e_smooth).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
+
+            - http_request.post:
+                url: https://iot.irons.nz/api/v1/${http_api_key}/telemetry
+                request_headers:
+                  Content-Type: application/json
+                json: |-
+                  root["ts"] = id(ha_time).now().timestamp * 1000;
+                  JsonObject values = root["values"].to<JsonObject>();
+                  values["http_temperature"] = id(${wx_id}_temperature).state;
+                  values["http_humidity"] = id(${wx_id}_humidity).state;
+                  
+                  values["http_rain_total"] = id(${wx_id}_rain_total).state;
+                  values["http_rain_5min"] = id(${wx_id}_rain_5min).state;
+                  values["http_rain_1h"] = id(${wx_id}_rain_1h).state;
+                  values["http_rain_24h"] = id(${wx_id}_rain_24h).state;
+
+                  values["http_wind_dir"] = id(${wx_id}_wind_dir).state;
+                  values["http_wind_avg"] = id(${wx_id}_wind_avg).state;
+                  values["http_wind_max"] = id(${wx_id}_wind_max).state;
+                  values["http_wind_n_smooth"] = id(${wx_id}_wind_n_smooth).state;
+                  values["http_wind_e_smooth"] = id(${wx_id}_wind_e_smooth).state;
+                  values["http_wind_dir_smooth"] = id(${wx_id}_wind_dir_smooth).state;
 
 
 sensor:
@@ -34,7 +68,7 @@ sensor:
     accuracy_decimals: 1
     unit_of_measurement: "°C"
     icon: "mdi:thermometer" 
-    
+
   # Humidity
   - platform: template
     name: "${wx_name} humidity"
@@ -42,7 +76,7 @@ sensor:
     accuracy_decimals: 1
     unit_of_measurement: "%RH"
     icon: "mdi:water-percent"
-    
+
   # Rain
   - platform: template
     name: "${wx_name} rain total"
@@ -91,7 +125,7 @@ sensor:
     accuracy_decimals: 1
     unit_of_measurement: "°"
     icon: "mdi:compass"
-    
+
   - platform: template
     name: "${wx_name} wind speed average"
     id: ${wx_id}_wind_avg
@@ -116,7 +150,7 @@ sensor:
         alpha: 0.05
         send_every: 1
         send_first_at: 1
-            
+
   - platform: template
     id: ${wx_id}_wind_e_smooth
     internal: true
@@ -127,7 +161,7 @@ sensor:
         alpha: 0.05
         send_every: 1
         send_first_at: 1
-    
+
   - platform: template
     name: "${wx_name} wind direction smooth"
     id: ${wx_id}_wind_dir_smooth
