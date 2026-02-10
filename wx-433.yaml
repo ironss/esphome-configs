@@ -37,27 +37,34 @@ rtl_433:
                 id(${wx_id}_wind_n_smooth).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
                 id(${wx_id}_wind_e_smooth).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi)); 
 
-            - http_request.post:
-                url: https://iot.irons.nz/api/v1/${http_api_key}/telemetry
-                request_headers:
-                  Content-Type: application/json
-                json: |-
-                  root["ts"] = id(ha_time).now().timestamp * 1000;
-                  JsonObject values = root["values"].to<JsonObject>();
-                  values["http_temperature"] = id(${wx_id}_temperature).state;
-                  values["http_humidity"] = id(${wx_id}_humidity).state;
+            - if:
+                condition:
+                  and:
+                    - time.has_time:
+                        id: ha_time
+                    - wifi.connected:
+                then:
+                  - http_request.post:
+                      url: https://iot.irons.nz/api/v1/${http_api_key}/telemetry
+                      request_headers:
+                        Content-Type: application/json
+                      json: |-
+                        root["ts"] = id(ha_time).now().timestamp * 1000;
+                        JsonObject values = root["values"].to<JsonObject>();
+                        values["http_temperature"] = id(${wx_id}_temperature).state;
+                        values["http_humidity"] = id(${wx_id}_humidity).state;
                   
-                  values["http_rain_total"] = id(${wx_id}_rain_total).state;
-                  values["http_rain_5min"] = id(${wx_id}_rain_5min).state;
-                  values["http_rain_1h"] = id(${wx_id}_rain_1h).state;
-                  values["http_rain_24h"] = id(${wx_id}_rain_24h).state;
+                        values["http_rain_total"] = id(${wx_id}_rain_total).state;
+                        values["http_rain_5min"] = id(${wx_id}_rain_5min).state;
+                        values["http_rain_1h"] = id(${wx_id}_rain_1h).state;
+                        values["http_rain_24h"] = id(${wx_id}_rain_24h).state;
 
-                  values["http_wind_dir"] = id(${wx_id}_wind_dir).state;
-                  values["http_wind_avg"] = id(${wx_id}_wind_avg).state;
-                  values["http_wind_max"] = id(${wx_id}_wind_max).state;
-                  values["http_wind_n_smooth"] = id(${wx_id}_wind_n_smooth).state;
-                  values["http_wind_e_smooth"] = id(${wx_id}_wind_e_smooth).state;
-                  values["http_wind_dir_smooth"] = id(${wx_id}_wind_dir_smooth).state;
+                        values["http_wind_dir"] = id(${wx_id}_wind_dir).state;
+                        values["http_wind_avg"] = id(${wx_id}_wind_avg).state;
+                        values["http_wind_max"] = id(${wx_id}_wind_max).state;
+                        values["http_wind_n_smooth"] = id(${wx_id}_wind_n_smooth).state;
+                        values["http_wind_e_smooth"] = id(${wx_id}_wind_e_smooth).state;
+                        values["http_wind_dir_smooth"] = id(${wx_id}_wind_dir_smooth).state;
 
 
 sensor:
