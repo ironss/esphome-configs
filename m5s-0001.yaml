@@ -49,7 +49,7 @@ packages:
       rx_id: rx_A
       wx_tx_model: "Fineoffset-WHx080"
       wx_tx_id: 87
-      http_api_key: http_api_key1
+      http_api_key: ${http_api_key1}
       
   fonts: !include
     file: fonts-m5stack.yaml
@@ -328,4 +328,3 @@ lvgl:
         vars:
           page_id: page_wifi
           page_title: "Wi-Fi"
-
