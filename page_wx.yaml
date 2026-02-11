@@ -153,14 +153,14 @@ widgets:
 
   # Temperature inside
   - label:
-      text: "Temperature in"
+      text: "Temperature int"
       text_font: text_normal
   - label:
-      id: ${page_id}_value_temperature_in
+      id: ${page_id}_value_temperature_int
       grid_cell_x_align: END
       text: "--"
       text_font: text_bold
   - label:
-      id: ${page_id}_unit_temperature_in
+      id: ${page_id}_unit_temperature_int
       text: "°C"
       text_font: text_normal

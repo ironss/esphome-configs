@@ -2,14 +2,13 @@ sensor:
   - platform: lps22
     id: ${lps22_id}
     address: ${lps22_i2c_addr}
-    
-    temperature:
-      id: ${lps22_id}_temperature
-      name: "${lps22_name} temperature"
-      accuracy_decimals: 1
-      
+
     pressure:
-      id: ${lps22_id}_pressure
-      name: "${lps22_name} pressure"
+      id: wx_pressure
+      name: "Pressure"
       accuracy_decimals: 1
 
+    temperature:
+      id: wx_temperature_int
+      name: "Temperature int"
+      accuracy_decimals: 1

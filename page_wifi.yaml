@@ -64,3 +64,15 @@ widgets:
       text: " "
       text_font: text_normal
 
+  - label:
+      text: "MAC"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_macaddr
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_macaddr
+      text: " "
+      text_font: text_normal
