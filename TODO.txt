@@ -8,7 +8,8 @@ Application
     [X] Use 433 MHz SX1275 (LoRa chip)
     [ ] Remove unwanted decoders from RTL-433 to speed it up
     [ ] Use macros (or something) to simplify LVGL UI definition
-    [ ] Send data to Thingsboard (MQTT publish)
+    [ ] NO: Send data to Thingsboard (MQTT publish): it was quite unreliable
+    [X] Send data to Thingsboard (HTTP post)
     [ ] Send data to WoW (HTTP post)
     [ ] Send data to OpenWeatherMap (HTTP post)
 
@@ -21,13 +22,31 @@ UI
 
 [ ] Font selection
     [ ] M5Stick C
-    [ ] M5Stack
+    [ ] M5Stack or similar
 
-    
+
 ESPHome
 =======
 
 [X] Move secrets into secrets file
+
+[ ] Secrets stored in Keepass—use pykeepass to access password safe.
+    [ ] Store secrets as JSON in notes
+    [ ] Or as custom attributes.
+    [ ] Lock keepass database to Ubikey or similar
+
+[ ] Database of other device-specific; Keepass will work, but means the secret storage is used for non-secret stuff
+    [ ] Needs a nice front-end
+    [ ] Raw database viewer-editor
+    [ ] Application-specific editor
+    [ ] SQLite database, with a nice viewer-editor
+
+[ ] Bunch of scripts to build a thing. I use two or three recipes
+    [ ] Compile, deploy and log
+    [ ] Log only
+    [ ] Compile only
+
+[ ] Inject git version number into build
 
 [ ] Find out how to modularise the configuration
     [X] Fixed values
@@ -43,11 +62,11 @@ ESPHome
     [X] Right-align values
     [ ] Parameter display row
 
-[ ] Use display to show Home Assistant data, rather than (or as well as) ESPHome internals
-[ ] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
-    
+[X] Use display to show Home Assistant data, rather than (or as well as) ESPHome internals
+[X] Rate filters to calculate 1-hour and 24-hour rainfall from cumulative rainfall
+
 [ ] OTA
-    [ ] Test it
+    [X] Test it
     [ ] Find out how to restrict what can be uploaded
         [ ] Hardware models
         [ ] Applications allowed on the device
@@ -59,15 +78,15 @@ ESP32 devices
 [ ] M5Stick-C
     [X] Higher download speed: M5Stick-C supports 500 MHz
         [X] and 750 MHz
-    
+
     [X] Find and set display configuration
-    
+
     [X] Choose a few suitable fonts
         [X] Standard text, normal: 75dpi/helvR10.bdf
         [X] Standard text, bold: 75dpi/helvB10.bdf
         [X] Header text, bold: 75dpi/helvB12.bdf
         [X] Small text: 75dpi/helvR08.bdf
-    
+
     [X] Create an example diagnostics page
     [ ] Use MIPI SPI display driver rather than ST7735
 
@@ -82,7 +101,7 @@ ESP32 devices
 
 [ ] CB2S (Arlec switch/power-meter)
 
-[ ] 
+[ ]
 
 Sensor hardware devices
 =======================
@@ -93,4 +112,3 @@ Sensor hardware devices
 [X] LPS25HW module
 [X] OOK decoder
 [X] RTL_433 decoder
-
