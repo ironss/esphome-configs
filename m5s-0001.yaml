@@ -25,6 +25,10 @@ globals:
     type: bool
     initial_value: 'false'
 
+  - id: g_wx_telemetry_blocked
+    type: bool
+    initial_value: 'false'
+
 
 packages:
   core_hw: !include
@@ -86,6 +90,7 @@ ota:
 
 
 wifi:
+  id: wifi1
   fast_connect: true
   enable_btm: true
   enable_rrm: true
@@ -177,9 +182,7 @@ sensor:
     pressure:
       on_value:
         then:
-          - lambda:
-              id(g_wx_telemetry_dirty) = true;
-
+          - script.execute: wx_telemetry_trigger
           - lvgl.label.update:
               id: page_wx_value_pressure
               text:
@@ -190,9 +193,7 @@ sensor:
     temperature:
       on_value:
         then:
-          - lambda:
-              id(g_wx_telemetry_dirty) = true;
-
+          - script.execute: wx_telemetry_trigger
           - lvgl.label.update:
               id: page_wx_value_temperature_int
               text:
@@ -205,9 +206,7 @@ sensor:
   - id: !extend wx_temperature
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_temperature
             text:
@@ -219,9 +218,7 @@ sensor:
   - id: !extend wx_humidity
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_humidity
             text:
@@ -233,9 +230,7 @@ sensor:
   - id: !extend wx_rain_total
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
     #     - lvgl.label.update:
     #         id: page_wx_value_rain_total
     #         text:
@@ -246,9 +241,7 @@ sensor:
   - id: !extend wx_rain_5min
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
     #     - lvgl.label.update:
     #         id: page_wx_value_rain_5min
     #         text:
@@ -259,9 +252,7 @@ sensor:
   - id: !extend wx_rain_1h
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_rain_1h
             text:
@@ -272,9 +263,7 @@ sensor:
   - id: !extend wx_rain_24h
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_rain_24h
             text:
@@ -286,9 +275,7 @@ sensor:
   - id: !extend wx_wind_avg
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_wind_speed_m_s
             text:
@@ -305,9 +292,7 @@ sensor:
   - id: !extend wx_wind_max
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         # - lvgl.label.update:
         #     id: page_wx_value_wind_max_m_s
         #     text:
@@ -325,9 +310,7 @@ sensor:
   - id: !extend wx_wind_dir
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         # - lvgl.label.update:
         #     id: page_wx_value_wind_dir
         #     text:
@@ -338,9 +321,7 @@ sensor:
   - id: !extend wx_wind_dir_smooth
     on_value:
       then:
-        - lambda:
-            id(g_wx_telemetry_dirty) = true;
-
+        - script.execute: wx_telemetry_trigger
         - lvgl.label.update:
             id: page_wx_value_wind_dir
             text:
@@ -399,48 +380,63 @@ lvgl:
 
 
 script:
-  - id: tb_send_batched
-    mode: single
+  - id: wx_telemetry_trigger
     then:
+      - lambda: id(g_wx_telemetry_dirty) = true;
+      - script.execute: wx_telemetry_send_throttled
+
+
+  - id: wx_telemetry_send_throttled
+    then:
+      - logger.log: "Telemetry: evaluating"
       - if:
           condition:
             and:
+              - lambda: 'return !id(g_wx_telemetry_blocked);'
               - lambda: 'return id(g_wx_telemetry_dirty);'
-              - wifi.connected:
-              - time.has_time:
-                  id: ha_time
+              - lambda: 'return id(wifi1).is_connected();'
+              - lambda: 'return id(ha_time).now().is_valid();'
           then:
-            - logger.log:
-                level: INFO
-                format: "Sending telemetry"
-
-            - http_request.post:
-                url: "https://iot.irons.nz/api/v1/${http_api_key1}/telemetry"
-                request_headers:
-                  Content-Type: application/json
-                json: !lambda |-
-                  root["ts"] = id(ha_time).now().timestamp * 1000ULL;
-                  JsonObject values = root["values"].to<JsonObject>();
-
-                  if (!isnan(id(wx_temperature).state))      values["temperature"]     = id(wx_temperature).state;
-                  if (!isnan(id(wx_humidity).state))         values["humidity"]        = id(wx_humidity).state;
-                  if (!isnan(id(wx_rain_total).state))       values["rain_total"]      = id(wx_rain_total).state;
-                  if (!isnan(id(wx_rain_5min).state))        values["rain_5min"]       = id(wx_rain_5min).state;
-                  if (!isnan(id(wx_rain_1h).state))          values["rain_1h"]         = id(wx_rain_1h).state;
-                  if (!isnan(id(wx_rain_24h).state))         values["rain_24h"]        = id(wx_rain_24h).state;
-                  if (!isnan(id(wx_wind_avg).state))         values["wind_avg"]        = id(wx_wind_avg).state;
-                  if (!isnan(id(wx_wind_max).state))         values["wind_max"]        = id(wx_wind_max).state;
-                  if (!isnan(id(wx_wind_dir).state))         values["wind_dir"]        = id(wx_wind_dir).state;
-                  if (!isnan(id(wx_wind_n_smooth).state))    values["wind_n_smooth"]   = id(wx_wind_n_smooth).state;
-                  if (!isnan(id(wx_wind_e_smooth).state))    values["wind_e_smooth"]   = id(wx_wind_e_smooth).state;
-                  if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"] = id(wx_wind_dir_smooth).state;
-                  if (!isnan(id(wx_pressure).state))         values["pressure"]        = id(wx_pressure).state;
-                  if (!isnan(id(wx_temperature_int).state))  values["temperature_int"] = id(wx_temperature_int).state;
-
+            - logger.log: "Telemetry: sending"
+            - lambda: id(g_wx_telemetry_blocked) = true;
             - lambda: id(g_wx_telemetry_dirty) = false;
+            - script.execute: wx_telemetry_send_now
+            - logger.log: "Telemetry: sent"
+            - delay: 60s
+            - lambda: id(g_wx_telemetry_blocked) = false;
+            - logger.log: "Telemetry: unblocked"
+          else:
+            - logger.log:
+                format: "Telemetry: not sending: %d %d %d %d"
+                args:
+                  - 'id(g_wx_telemetry_blocked)'
+                  - 'id(g_wx_telemetry_dirty)'
+                  - 'id(wifi1).is_connected()'
+                  - 'id(ha_time).now().is_valid()'
 
 
-interval:
-  - interval: 60s
+  - id: wx_telemetry_send_now
     then:
-      - script.execute: tb_send_batched
+      - http_request.post:
+          url: "https://iot.irons.nz/api/v1/${http_api_key1}/telemetry"
+          request_headers:
+            Content-Type: application/json
+          json: !lambda |-
+            root["ts"] = id(ha_time).now().timestamp * 1000ULL;
+            JsonObject values = root["values"].to<JsonObject>();
+
+            if (!isnan(id(wx_temperature).state))      values["temperature"]     = id(wx_temperature).state;
+            if (!isnan(id(wx_humidity).state))         values["humidity"]        = id(wx_humidity).state;
+            if (!isnan(id(wx_rain_total).state))       values["rain_total"]      = id(wx_rain_total).state;
+            if (!isnan(id(wx_rain_5min).state))        values["rain_5min"]       = id(wx_rain_5min).state;
+            if (!isnan(id(wx_rain_1h).state))          values["rain_1h"]         = id(wx_rain_1h).state;
+            if (!isnan(id(wx_rain_24h).state))         values["rain_24h"]        = id(wx_rain_24h).state;
+            if (!isnan(id(wx_wind_avg).state))         values["wind_avg"]        = id(wx_wind_avg).state;
+            if (!isnan(id(wx_wind_max).state))         values["wind_max"]        = id(wx_wind_max).state;
+            if (!isnan(id(wx_wind_dir).state))         values["wind_dir"]        = id(wx_wind_dir).state;
+            if (!isnan(id(wx_wind_n_smooth).state))    values["wind_n_smooth"]   = id(wx_wind_n_smooth).state;
+            if (!isnan(id(wx_wind_e_smooth).state))    values["wind_e_smooth"]   = id(wx_wind_e_smooth).state;
+            if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"] = id(wx_wind_dir_smooth).state;
+            if (!isnan(id(wx_pressure).state))         values["pressure"]        = id(wx_pressure).state;
+            if (!isnan(id(wx_temperature_int).state))  values["temperature_int"] = id(wx_temperature_int).state;
+
