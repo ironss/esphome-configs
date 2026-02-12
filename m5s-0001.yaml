@@ -13,11 +13,13 @@ esphome:
   name: m5s-0001
   includes:
     - vc_version.h
+    - build_details.h
 
   on_boot:
     then:
       - lambda: |-
           id(firmware_version).publish_state(FW_VERSION);
+          id(build_ulid).publish_state(BUILD_ULID);
       - output.turn_on:
           id: lcd_bl
       - output.set_level:
@@ -154,6 +156,11 @@ text_sensor:
   - platform: template
     id: firmware_version
     name: "Firmware version"
+    entity_category: diagnostic
+
+  - platform: template
+    id: build_ulid
+    name: "Build ULID"
     entity_category: diagnostic
 
   - platform: wifi_info
@@ -472,4 +479,5 @@ script:
             Content-Type: application/json
           json: !lambda |-
             root["fw_version"] = id(firmware_version).state;
+            root["build_ulid"] = id(build_ulid).state;
 
