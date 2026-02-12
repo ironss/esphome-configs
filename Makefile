@@ -60,8 +60,15 @@ $(BUILD_DIR)/build_details.h: Makefile
 .PHONY: $(BUILD_DIR)/build_details.h
 
 
-generate-secrets:
-	@.venv/bin/python3 generate_secrets.py > secrets.yaml
+generate-secrets: secrets.yaml
+.PHONY: generate-secrets
+
+secrets.yaml:
+	@rm -f $@.tmp
+	@.venv/bin/python3 generate_secrets.py >> $@.tmp
+	@diff -N --unchanged-line-format '' --old-line-format '-%L' --new-line-format '+%L' $@ $@.tmp || mv $@.tmp $@
+	@rm -f $@.tmp
+.PHONY: secrets.yaml
 
 compile: $(PRODUCT).yaml vc-version
 	$(ESPHOME_BIN) compile $<
