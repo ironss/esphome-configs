@@ -11,6 +11,9 @@ substitutions:
 
 esphome:
   name: m5s-0001
+  includes:
+    - vc_version.h
+
   on_boot:
     then:
       - output.turn_on:
@@ -21,6 +24,10 @@ esphome:
 
 
 globals:
+  - id: g_attributes_sent
+    type: bool
+    initial_value: 'false'
+
   - id: g_wx_telemetry_dirty
     type: bool
     initial_value: 'false'
@@ -142,6 +149,13 @@ http_request:
 
 
 text_sensor:
+  - platform: template
+    id: firmware_version
+    name: "Firmware version"
+    internal: true
+    lambda: |-
+      return {FW_VERSION};
+
   - platform: wifi_info
     ip_address:
       name: "IP address"
@@ -402,6 +416,15 @@ script:
             - lambda: id(g_wx_telemetry_dirty) = false;
             - script.execute: wx_telemetry_send_now
             - logger.log: "Telemetry: sent"
+
+            - if:
+                condition:
+                  lambda: 'return !id(g_attributes_sent);'
+                then:
+                  - logger.log: "Attributes: sent"
+                  - script.execute: wx_attributes_send_now
+                  - lambda: id(g_attributes_sent) = true;
+
             - delay: 60s
             - lambda: id(g_wx_telemetry_blocked) = false;
             - logger.log: "Telemetry: unblocked"
@@ -439,4 +462,15 @@ script:
             if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"] = id(wx_wind_dir_smooth).state;
             if (!isnan(id(wx_pressure).state))         values["pressure"]        = id(wx_pressure).state;
             if (!isnan(id(wx_temperature_int).state))  values["temperature_int"] = id(wx_temperature_int).state;
+
+
+  - id: wx_attributes_send_now
+    then:
+      - http_request.post:
+          url: "https://iot.irons.nz/api/v1/${http_api_key1}/attributes"
+          request_headers:
+            Content-Type: application/json
+          json: !lambda |-
+            root["version"] = "<unknown>";
+            root["vc_version"] = FW_VERSION;
 
