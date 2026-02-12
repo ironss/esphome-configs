@@ -102,3 +102,7 @@ compile: $(DEVICE_ID).yaml vc-version secrets.yaml
 run: $(DEVICE_ID).yaml vc-version secrets.yaml
 	$(ESPHOME_BIN) run $< --device $(DEVICE_UART)
 .PHONY: run
+
+logs: $(DEVICE_ID).yaml vc-version secrets.yaml
+	$(ESPHOME_BIN) run $< --device $(DEVICE_UART)
+.PHONY: logs
