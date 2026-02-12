@@ -99,7 +99,7 @@ if not gr:
 en = kp.find_entries(path=(grname, dev_id), first=True)
 if not en:
     gr = kp.find_groups(name=grname, first=True)
-    en = kp.add_entry(gr, dev_id, dev_id, dev_id)
+    en = kp.add_entry(gr, title=dev_id, username=dev_id, password="")
 
 dirty = False
 properties = {}
