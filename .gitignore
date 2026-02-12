@@ -5,4 +5,7 @@
 /.venv/
 /secrets.yaml
 
+vc_version.h
+build_details.h
+
 /fonts/

@@ -1,0 +1,18 @@
+id: ${page_id}
+lambda: |-
+  it.printf(120, 20, id(heading), TextAlign::BASELINE_CENTER, "${page_title}");
+
+  it.printf(2, 31, id(text_normal), TextAlign::BASELINE_LEFT, "RSSI");
+  it.printf(120, 31, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
+  it.printf(128, 31, id(text_normal), TextAlign::BASELINE_LEFT, "dBm");
+
+  it.printf(2, 46, id(text_normal), TextAlign::BASELINE_LEFT, "Battery");
+  it.printf(120, 46, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
+  it.printf(128, 46, id(text_normal), TextAlign::BASELINE_LEFT, "%%");
+
+  it.printf(2, 61, id(text_normal), TextAlign::BASELINE_LEFT, "Uptime");
+  it.printf(120, 61, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(uptime_s).state/3600);
+  it.printf(128, 61, id(text_normal), TextAlign::BASELINE_LEFT, "h");
+
+  it.printf(2, 76, id(text_normal), TextAlign::BASELINE_LEFT, "Line 4");
+

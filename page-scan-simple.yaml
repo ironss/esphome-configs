@@ -1,0 +1,7 @@
+id: ${page_id}
+lambda: |-
+  it.printf(120, 20, id(heading), TextAlign::BASELINE_CENTER, "${page_title}");
+  it.printf(96, 35, id(text_normal), TextAlign::BASELINE_LEFT, "%s", id(tag_id).c_str());
+  it.printf(96, 50, id(text_normal), TextAlign::BASELINE_LEFT, "%s", id(tag_result).c_str());
+
+
