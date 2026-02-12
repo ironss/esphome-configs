@@ -6,7 +6,7 @@
 # * LoRa433 module, modified with
 
 substitutions:
-  http_api_key1: !secret api_key_wsh_000002
+  http_api_key1: !secret m5s-0001-tb_api_key
 
 
 esphome:
@@ -92,12 +92,12 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key_m5s-0001
+    key: !secret m5s-0001-ha_api_key
 
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: !secret m5s-0001-ota_password
 
 
 wifi:
@@ -107,14 +107,11 @@ wifi:
   enable_rrm: true
 
   networks:
-    - ssid: "wodexisixes-6"
-      password: !secret "wifi_psk_wodexisixes-6"
+    - ssid: !secret wifi-1-ssid
+      password: !secret wifi-1-psk
 
-    - ssid: "ioSphere dev"
-      password: !secret "wifi_psk_ioSphere dev"
-
-    - ssid: "wodexitose"
-      password: !secret "wifi_psk_wodexitose"
+    - ssid: !secret wifi-2-ssid
+      password: !secret wifi-2-ssid
 
   on_connect:
     then:
@@ -480,4 +477,3 @@ script:
           json: !lambda |-
             root["fw_version"] = id(firmware_version).state;
             root["build_ulid"] = id(build_ulid).state;
-

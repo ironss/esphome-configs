@@ -1,15 +1,35 @@
-# Version and build details
+# Top-level makefile
 # Copyright © Stephen Irons 2026
 
-PRODUCT := $(PRODUCT)
-DEVICE := /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0
+# Device details
+
+# Unique ID for the device, key for looking up
+# * device public details
+# * device secrets
+
+DEVICE_ID := $(DEVICE_ID)
+
+# Device public details
+# Look up in a public database
+DEVICE_NAME := M5S-0001
+DEVICE_MANUFACTURER := Ironspark
+DEVICE_MODEL := 99-0001-000001-001
+DEVICE_SERIAL := 999-00000001
+DEVICE_UUID := 7f0f0c99-dde0-4dde-9898-6787a2cbc83b
+DEVICE_ULID := 01KH8CSGGK3J1NJZZM73CV71PN
+
+DEVICE_UART := /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0
+DEVICE_HOSTNAME := m5s-0001.local
+DEVICE_IPADDR := 192.168.1.121
+
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
 
 
-
 compile:
+
+# Version and build details
 
 # Build properties
 BUILD_START := $(shell date +%s.%3N)
@@ -60,6 +80,8 @@ $(BUILD_DIR)/build_details.h: Makefile
 .PHONY: $(BUILD_DIR)/build_details.h
 
 
+# Secrets
+
 generate-secrets: secrets.yaml
 .PHONY: generate-secrets
 
@@ -70,11 +92,13 @@ secrets.yaml:
 	@rm -f $@.tmp
 .PHONY: secrets.yaml
 
-compile: $(PRODUCT).yaml vc-version
+
+# Tasks
+
+compile: $(DEVICE_ID).yaml vc-version secrets.yaml
 	$(ESPHOME_BIN) compile $<
 .PHONY: compile
 
-run: $(PRODUCT).yaml vc-version
-	$(ESPHOME_BIN) run $< --device $(DEVICE)
+run: $(DEVICE_ID).yaml vc-version secrets.yaml
+	$(ESPHOME_BIN) run $< --device $(DEVICE_UART)
 .PHONY: run
-
