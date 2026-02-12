@@ -8,6 +8,7 @@ BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
 
 
+
 compile:
 
 # Build properties
@@ -58,6 +59,9 @@ $(BUILD_DIR)/build_details.h: Makefile
 	@rm -f $@.tmp
 .PHONY: $(BUILD_DIR)/build_details.h
 
+
+generate-secrets:
+	@.venv/bin/python3 generate_secrets.py > secrets.yaml
 
 compile: $(PRODUCT).yaml vc-version
 	$(ESPHOME_BIN) compile $<
