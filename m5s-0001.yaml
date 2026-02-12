@@ -16,6 +16,8 @@ esphome:
 
   on_boot:
     then:
+      - lambda: |-
+          id(firmware_version).publish_state(FW_VERSION);
       - output.turn_on:
           id: lcd_bl
       - output.set_level:
@@ -152,9 +154,7 @@ text_sensor:
   - platform: template
     id: firmware_version
     name: "Firmware version"
-    internal: true
-    lambda: |-
-      return {FW_VERSION};
+    entity_category: diagnostic
 
   - platform: wifi_info
     ip_address:
@@ -471,6 +471,5 @@ script:
           request_headers:
             Content-Type: application/json
           json: !lambda |-
-            root["version"] = "<unknown>";
-            root["vc_version"] = FW_VERSION;
+            root["fw_version"] = id(firmware_version).state;
 
