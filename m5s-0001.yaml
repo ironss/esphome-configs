@@ -464,20 +464,22 @@ script:
             root["ts"] = id(ha_time).now().timestamp * 1000ULL;
             JsonObject values = root["values"].to<JsonObject>();
 
-            if (!isnan(id(wx_temperature).state))      values["temperature"]     = id(wx_temperature).state;
-            if (!isnan(id(wx_humidity).state))         values["humidity"]        = id(wx_humidity).state;
-            if (!isnan(id(wx_rain_total).state))       values["rain_total"]      = id(wx_rain_total).state;
-            if (!isnan(id(wx_rain_5min).state))        values["rain_5min"]       = id(wx_rain_5min).state;
-            if (!isnan(id(wx_rain_1h).state))          values["rain_1h"]         = id(wx_rain_1h).state;
-            if (!isnan(id(wx_rain_24h).state))         values["rain_24h"]        = id(wx_rain_24h).state;
-            if (!isnan(id(wx_wind_avg).state))         values["wind_avg"]        = id(wx_wind_avg).state;
-            if (!isnan(id(wx_wind_max).state))         values["wind_max"]        = id(wx_wind_max).state;
-            if (!isnan(id(wx_wind_avg_smooth).state))  values["wind_avg_smooth"] = id(wx_wind_avg_smooth).state;
-            if (!isnan(id(wx_wind_max_smooth).state))  values["wind_max_smooth"] = id(wx_wind_avg_smooth).state;
-            if (!isnan(id(wx_wind_dir).state))         values["wind_dir"]        = id(wx_wind_dir).state;
-            if (!isnan(id(wx_wind_n_smooth).state))    values["wind_n_smooth"]   = id(wx_wind_n_smooth).state;
-            if (!isnan(id(wx_wind_e_smooth).state))    values["wind_e_smooth"]   = id(wx_wind_e_smooth).state;
-            if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"] = id(wx_wind_dir_smooth).state;
+            if (!isnan(id(wx_temperature).state))      values["temperature"]      = id(wx_temperature).state;
+            if (!isnan(id(wx_humidity).state))         values["humidity"]         = id(wx_humidity).state;
+            if (!isnan(id(wx_rain_total).state))       values["rain_total"]       = id(wx_rain_total).state;
+            if (!isnan(id(wx_rain_5min).state))        values["rain_5min"]        = id(wx_rain_5min).state;
+            if (!isnan(id(wx_rain_1h).state))          values["rain_1h"]          = id(wx_rain_1h).state;
+            if (!isnan(id(wx_rain_24h).state))         values["rain_24h"]         = id(wx_rain_24h).state;
+            if (!isnan(id(wx_wind_avg).raw_state))     values["wind_avg_raw"]     = id(wx_wind_avg).raw_state;
+            if (!isnan(id(wx_wind_max).raw_state))     values["wind_max_raw"]     = id(wx_wind_max).raw_state;
+            if (!isnan(id(wx_wind_dir).state))         values["wind_dir"]         = id(wx_wind_dir).state;
+            if (!isnan(id(wx_wind_avg).state))         values["wind_avg_smooth"]  = id(wx_wind_avg).state;
+            if (!isnan(id(wx_wind_max).state))         values["wind_max_smooth"]  = id(wx_wind_max).state;
+            if (!isnan(id(wx_wind_n).raw_state))       values["wind_n_raw"]       = id(wx_wind_n).raw_state;
+            if (!isnan(id(wx_wind_e).raw_state))       values["wind_e_raw"]       = id(wx_wind_e).raw_state;
+            if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"]  = id(wx_wind_dir_smooth).state;
+            if (!isnan(id(wx_wind_avg_smooth).state))  values["wind_avg_smooth1"] = id(wx_wind_avg_smooth).state;
+
             if (!isnan(id(wx_pressure).state))         values["pressure"]        = id(wx_pressure).state;
             if (!isnan(id(wx_temperature_int).state))  values["temperature_int"] = id(wx_temperature_int).state;
 
