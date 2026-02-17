@@ -5,6 +5,8 @@
 /.venv/
 /secrets.yaml
 
+/esphome.kdbx
+
 vc_version.h
 build_details.h
 
