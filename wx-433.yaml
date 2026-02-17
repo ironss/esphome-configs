@@ -32,6 +32,8 @@ rtl_433:
                 id(wx_rain_24h).publish_state(x["rain_mm"].as<float>());
                 id(wx_wind_avg).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
                 id(wx_wind_max).publish_state(x["wind_max_km_h"].as<float>()*0.278);
+                id(wx_wind_avg_smooth).publish_state(x["wind_avg_km_h"].as<float>()*0.278);
+                id(wx_wind_max_smooth).publish_state(x["wind_max_km_h"].as<float>()*0.278);
                 id(wx_wind_dir).publish_state(x["wind_dir_deg"].as<float>());
                 id(wx_wind_n_smooth).publish_state(std::sin(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi));
                 id(wx_wind_e_smooth).publish_state(std::cos(-x["wind_dir_deg"].as<float>() / 360 * 2 * std::numbers::pi));
@@ -95,7 +97,7 @@ sensor:
       - delay_delta:
           window_size: 288
 
-  # Wind
+  # Wind speed
   - platform: template
     id: wx_wind_avg
     name: "Wind speed average"
@@ -110,6 +112,31 @@ sensor:
     unit_of_measurement: "m.s-1"
     icon: "mdi:weather-windy"
 
+  - platform: template
+    id: wx_wind_avg_smooth
+    name: "Wind speed average smooth"
+    accuracy_decimals: 1
+    unit_of_measurement: "m.s-1"
+    icon: "mdi:weather-windy"
+    filters:
+      exponential_moving_average:
+        alpha: 0.05
+        send_every: 1
+        send_first_at: 1
+
+  - platform: template
+    id: wx_wind_max_smooth
+    name: "Wind speed max smooth"
+    accuracy_decimals: 1
+    unit_of_measurement: "m.s-1"
+    icon: "mdi:weather-windy"
+    filters:
+      exponential_moving_average:
+        alpha: 0.05
+        send_every: 1
+        send_first_at: 1
+
+  # Wind direction
   - platform: template
     id: wx_wind_dir
     name: "Wind direction"

@@ -472,6 +472,8 @@ script:
             if (!isnan(id(wx_rain_24h).state))         values["rain_24h"]        = id(wx_rain_24h).state;
             if (!isnan(id(wx_wind_avg).state))         values["wind_avg"]        = id(wx_wind_avg).state;
             if (!isnan(id(wx_wind_max).state))         values["wind_max"]        = id(wx_wind_max).state;
+            if (!isnan(id(wx_wind_avg_smooth).state))  values["wind_avg_smooth"] = id(wx_wind_avg_smooth).state;
+            if (!isnan(id(wx_wind_max_smooth).state))  values["wind_max_smooth"] = id(wx_wind_avg_smooth).state;
             if (!isnan(id(wx_wind_dir).state))         values["wind_dir"]        = id(wx_wind_dir).state;
             if (!isnan(id(wx_wind_n_smooth).state))    values["wind_n_smooth"]   = id(wx_wind_n_smooth).state;
             if (!isnan(id(wx_wind_e_smooth).state))    values["wind_e_smooth"]   = id(wx_wind_e_smooth).state;
