@@ -176,3 +176,39 @@ Fonts
         * Put it in the fonts directory
         * Verify that it works
         * Add it to version control, using '-f' to override the ignore.
+
+
+Product database
+================
+
+* Device_type
+    * ULID
+    * Model_number
+    * Informal_name
+    * Descriptor
+    * Serial_number_spec
+
+* Device_type_attribute
+    * ULID
+    * Device_type (ULID)
+    * Attribute name
+    * Multiplicity
+
+* Device
+    * ULID
+    * Manufacturer_name
+    * Model_number
+    * Serial_number
+
+* Device attribute
+    * ULID
+    * Device (ULID)
+    * Attribute (ULID)
+    * Value
+
+* History entry
+    * ULID
+    * Entity (ULID)
+    * Timestamp
+    * Operation -- formal description of what changed to what
+    * Comment
