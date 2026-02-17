@@ -18,6 +18,8 @@ esphome:
   on_boot:
     then:
       - lambda: |-
+          id(g_bootcount) += 1;
+      - lambda: |-
           id(firmware_version).publish_state(FW_VERSION);
           id(build_ulid).publish_state(BUILD_ULID);
       - output.turn_on:
@@ -28,6 +30,11 @@ esphome:
 
 
 globals:
+  - id: g_bootcount
+    type: int
+    initial_value: '0'
+    restore_value: yes
+
   - id: g_attributes_sent
     type: bool
     initial_value: 'false'
@@ -361,6 +368,11 @@ sensor:
               args:
                 - x
 
+  - platform: uptime
+    id: uptime_s
+    type: seconds
+    name: Uptime Sensor
+
   - platform: debug
     free:
       name: "Heap free"
@@ -466,6 +478,9 @@ script:
             if (!isnan(id(wx_wind_dir_smooth).state))  values["wind_dir_smooth"] = id(wx_wind_dir_smooth).state;
             if (!isnan(id(wx_pressure).state))         values["pressure"]        = id(wx_pressure).state;
             if (!isnan(id(wx_temperature_int).state))  values["temperature_int"] = id(wx_temperature_int).state;
+
+            values["bootcount"] = id(g_bootcount);
+            values["uptime"] = id(uptime_s).state;
 
 
   - id: wx_attributes_send_now
