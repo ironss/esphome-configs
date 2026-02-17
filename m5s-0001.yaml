@@ -15,6 +15,10 @@ esphome:
     - vc_version.h
     - build_details.h
 
+  platformio_options:
+    build_flags:
+      - -DMY_RTL433_DEVICES=DECL\\(fineoffset_wh1080\\)
+
   on_boot:
     then:
       - lambda: |-
