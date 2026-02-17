@@ -23,6 +23,7 @@ esphome:
     then:
       - lambda: |-
           id(g_bootcount) += 1;
+          id(bootcount).publish_state(id(g_bootcount));
       - lambda: |-
           id(firmware_version).publish_state(FW_VERSION);
           id(build_ulid).publish_state(BUILD_ULID);
@@ -386,6 +387,15 @@ sensor:
       name: "Heap max block"
     loop_time:
       name: "Loop time"
+
+  - platform: template
+    id: bootcount
+    name: "Bootcount"
+    entity_category: diagnostic
+    lambda: |-
+      return id(g_bootcount);
+    accuracy_decimals: 0
+    update_interval: never
 
 
 binary_sensor:
