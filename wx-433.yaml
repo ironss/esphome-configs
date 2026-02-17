@@ -75,7 +75,7 @@ sensor:
 
   - platform: template
     id: wx_rain_1h
-    name: Rain 1h"
+    name: "Rain 1h"
     accuracy_decimals: 1
     unit_of_measurement: "mm"
     icon: "mdi:water"
