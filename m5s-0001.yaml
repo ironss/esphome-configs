@@ -2,20 +2,36 @@
 # Copyright © Stephen Irons 2026
 
 # Hardware
-# * M5Stack
-# * LoRa433 module, modified with
+# * WX433-1
+#     * M5Stack
+#     * LoRa433 module, modified to bring OOK output to GPIO13
 
 substitutions:
+  device_id: m5s-0001
+  device_name: M5S-0001
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0011-00
+  device_model: WX433-1
+  device_serial: 99-9001-0001
+  device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0"
+  device_ipaddr: "192.168.1.121"
+  device_hostname: m5s-0001.local
+  device_uuid: 68e19178-3d74-4e04-a549-5ebc928c7a59
+
+  ha_api_key: !secret m5s-0001-ha_api_key
+  ota_password: !secret m5s-0001-ota_password
   http_api_key1: !secret m5s-0001-tb_api_key
 
 
 esphome:
-  name: m5s-0001
+  name: ${device_id}
+  friendly_name: ${device_name}
   includes:
     - vc_version.h
     - build_details.h
 
   platformio_options:
+    upload_port: ${device_uart}
     build_flags:
       - -DMY_RTL433_DEVICES=DECL\\(fineoffset_wh1080\\)
 
@@ -32,6 +48,29 @@ esphome:
       - output.set_level:
           id: lcd_bl
           level: 100%
+
+
+esp32:
+  board: m5stack-core-esp32
+  framework:
+    type: esp-idf
+#    sdkconfig_options:
+#      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
+
+#     type: arduino
+
+
+api:
+  encryption:
+    key: ${ha_api_key}
+
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+
+logger:
 
 
 globals:
@@ -87,31 +126,6 @@ packages:
     file: fonts-m5stack.yaml
 
 
-esp32:
-  board: m5stack-core-esp32
-  framework:
-    type: esp-idf
-#    sdkconfig_options:
-#      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
-
-#     type: arduino
-
-
-# Enable logging
-logger:
-
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: !secret m5s-0001-ha_api_key
-
-
-ota:
-  - platform: esphome
-    password: !secret m5s-0001-ota_password
-
-
 wifi:
   id: wifi1
   fast_connect: true
@@ -124,6 +138,11 @@ wifi:
 
     - ssid: !secret wifi-2-ssid
       password: !secret wifi-2-ssid
+
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
+
 
   on_connect:
     then:

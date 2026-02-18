@@ -1,12 +1,31 @@
+# ESPHome configuration for M5C-0003
+# Copyright © Stephen Irons 2026
+
+substitutions:
+  device_id: m5c-0003
+  device_name: M5C-0003
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0004-00
+  device_model: M5Stick-C
+  device_serial: 99-9001-0003
+  device_uart: "/dev/serial/by-id/usb-Kongou_Hikari_M5Stack_Intf_4152A0BD45-if00-port0"
+  device_ipaddr: "192.168.1.123"
+  device_hostname: m5c-0003.local
+  device_uuid: 1dea6250-1f83-4351-8ecc-1b40b4ab219d
+
+  ha_api_key: !secret m5c-0003-ha_api_key
+  ota_password: !secret m5c-0003-ota_password
+  ap_ssid: !secret m5c-0003-ap_ssid
+  ap_psk: !secret m5c-0003-ap_psk
+
+
 esphome:
-  name: m5c-0003
+  name: ${device_id}
+  friendly_name: $(device_name}
   platformio_options:
     upload_speed: 750000
+    upload_port: ${device_uart}
 
-external_components:
-  # AXP192 power management needed to turn TFT power on
-  - source: github://martydingo/esphome-axp192
-    components: [axp192]
 
 esp32:
   board: m5stick-c
@@ -14,25 +33,42 @@ esp32:
     # External component axp192 requires arduino framework
     type: arduino
 
-# Enable logging
-logger:
 
-# Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: ${ota_password}
+
+
+logger:
+
+
+external_components:
+  # AXP192 power management needed to turn TFT power on
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
 
 
 wifi:
+  id: wifi1
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true
+
   networks:
-    - ssid: !secret wifi1_ssid
-      password: !secret wifi1_psk
-    - ssid: !secret wifi2_ssid
-      password: !secret wifi2_psk
+    - ssid: !secret wifi-1-ssid
+      password: !secret wifi-1-psk
+
+    - ssid: !secret wifi-2-ssid
+      password: !secret wifi-2-ssid
+
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
 
 
 light:
@@ -40,6 +76,7 @@ light:
     output: builtin_led
     name: LED
     id: led1
+
 
 output:
   - platform: ledc

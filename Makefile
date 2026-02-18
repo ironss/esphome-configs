@@ -8,20 +8,7 @@
 # * device secrets
 
 DEVICE_ID := $(DEVICE_ID)
-
-# Device public details
-# Look up in a public database
-DEVICE_NAME := M5S-0001
-DEVICE_MANUFACTURER := Ironspark
-DEVICE_MODEL := 99-0001-000001-001
-DEVICE_SERIAL := 999-00000001
-DEVICE_UUID := 7f0f0c99-dde0-4dde-9898-6787a2cbc83b
-DEVICE_ULID := 01KH8CSGGK3J1NJZZM73CV71PN
-
-DEVICE_UART := /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0
-DEVICE_HOSTNAME := m5s-0001.local
-DEVICE_IPADDR := 192.168.1.121
-
+DEVICE_UART := $(DEVICE_UART)
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
@@ -100,9 +87,9 @@ compile: $(DEVICE_ID).yaml vc-version secrets.yaml
 .PHONY: compile
 
 run: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) run $< --device $(DEVICE_UART)
+	$(ESPHOME_BIN) run $<
 .PHONY: run
 
 logs: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
+	$(ESPHOME_BIN) logs $<
 .PHONY: logs

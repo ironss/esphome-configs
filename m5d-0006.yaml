@@ -1,42 +1,78 @@
+# ESPHome configuration for M5D-0006
+# Copyright © Stephen Irons 2026
+
+substitutions:
+  device_id: m5d-0006
+  device_name: M5D-0006
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0002-00
+  device_model: M5Dial
+  device_serial: 99-9001-0006
+  device_uart: "dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_C0:4E:30:12:AF:94-if00"
+  device_ipaddr: "192.168.1.126"
+  device_hostname: m5d-0006.local
+  device_uuid: d16a1546-bea3-409c-8c0d-46213c581849
+
+  ha_api_key: !secret m5d-0006-ha_api_key
+  ota_password: !secret m5d-0006-ota_password
+  ap_ssid: !secret m5d-0006-ap_ssid
+  ap_psk: !secret m5d-0006-ap_psk
+
+
 esphome:
-  name: m5d-0006
+  name: ${device_id}
+  friendly_name: ${device_name}
+  platformio_options:
+    board_build.flash_mode: dio
+    upload_port: ${device_uart}
+    
   on_boot:
     then:
       - pcf8563.read_time:
-  platformio_options:
-    board_build.flash_mode: dio
+
 
 esp32:
   variant: esp32s3
   framework:
     type: esp-idf
 
-wifi:
-  networks:
-    - ssid: "ioSphere dev"
-      password: !secret "wifi_psk_ioSphere dev"
-        
-    - ssid: "wodexitose"
-      password: !secret "wifi_psk_wodexitose"
-
-captive_portal:
-
 
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: ${ota_password}
 
 
 logger:
+
+
+wifi:
+  id: wifi1
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true
+
+  networks:
+    - ssid: !secret wifi-1-ssid
+      password: !secret wifi-1-psk
+
+    - ssid: !secret wifi-2-ssid
+      password: !secret wifi-2-ssid
+
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
+
 
 i2c:
   - id: internal_i2c
     sda: GPIO11
     scl: GPIO12
+
 
 rc522_i2c:
   - id: nfc_reader
@@ -63,6 +99,7 @@ rc522_i2c:
             
         - homeassistant.tag_scanned: !lambda 'return x;'
 
+
 output:
   - platform: ledc
     pin: GPIO3
@@ -72,8 +109,10 @@ output:
     pin: GPIO9
     id: backlight_output
 
+
 rtttl:
   output: buzzer
+
 
 sensor:
   - platform: rotary_encoder
@@ -100,6 +139,7 @@ time:
       then:
         - pcf8563.write_time:
 
+
 binary_sensor:
   - platform: gpio
     name: Button
@@ -108,10 +148,12 @@ binary_sensor:
     filters:
       - invert:
 
+
 spi:
   id: spi_bus
   mosi_pin: GPIO5
   clk_pin: GPIO6
+
 
 display:
   - platform: ili9xxx
@@ -168,6 +210,7 @@ touchscreen:
     address: 0x38
     # interrupt_pin: GPIO14  # not supported by this component
 
+
 light:
   - platform: monochromatic
     name: "Backlight"
@@ -178,6 +221,7 @@ light:
       then:
         - delay: 5s
         - light.turn_off: display_backlight
+
 
 globals:
   - id: tag_id
