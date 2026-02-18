@@ -242,7 +242,29 @@ class ProductDB:
             params.append(f"%{model}%")
 
         rows = self.conn.execute(query, params).fetchall()
-        return [dict(r) for r in rows]
+
+        devices = []
+        for r in rows:
+            device = {
+                "ulid": r["ulid"],
+                "device_type": r["device_type"],
+                "part_number": r["part_number"],
+                "manufacturer_name": r["manufacturer_name"],
+                "model": r["model"],
+                "serial_number": r["serial_number"],
+                "attributes": self.get_device_attributes(r["ulid"])
+            }
+            devices.append(device)
+
+        return devices
+
+    def get_device_attributes(self, device_ulid: str) -> List[Dict[str, Any]]:
+        rows = self.conn.execute("""
+            SELECT attribute_name, value
+            FROM device_attribute
+            WHERE device = ?
+        """, (device_ulid,)).fetchall()
+        return [{"attribute_name": r["attribute_name"], "value": r["value"]} for r in rows]
 
 ###############################################################################
 # CLI
