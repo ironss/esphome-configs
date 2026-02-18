@@ -194,19 +194,29 @@ class ProductDB:
 
     def find_devices(self, manufacturer=None,
                      model_number=None,
-                     serial_number=None) -> List[Dict[str, Any]]:
+                     serial_number=None,
+                     device_type_name=None) -> List[Dict[str, Any]]:
 
-        query = "SELECT * FROM device WHERE 1=1"
+        query = """
+        SELECT d.*, dt.informal_name AS device_type_name
+        FROM device d
+        JOIN device_type dt ON d.device_type = dt.ulid
+        WHERE 1=1
+        """
         params = []
         if manufacturer:
-            query += " AND manufacturer_name = ?"
+            query += " AND d.manufacturer_name = ?"
             params.append(manufacturer)
         if model_number:
-            query += " AND model_number = ?"
+            query += " AND d.model_number = ?"
             params.append(model_number)
         if serial_number:
-            query += " AND serial_number = ?"
+            query += " AND d.serial_number = ?"
             params.append(serial_number)
+        if device_type_name:
+            query += " AND dt.informal_name = ?"
+            params.append(device_type_name)
+
         rows = self.conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
 
@@ -241,6 +251,7 @@ def main():
     p.add_argument("--manufacturer")
     p.add_argument("--model")
     p.add_argument("--serial")
+    p.add_argument("--device-type-name", help="Match device_type.informal_name")
 
     args = parser.parse_args()
     db = ProductDB(args.db)
@@ -290,7 +301,10 @@ def main():
 
     elif args.command == "find-device":
         devices = db.find_devices(
-            args.manufacturer, args.model, args.serial
+            manufacturer=args.manufacturer,
+            model_number=args.model,
+            serial_number=args.serial,
+            device_type_name=args.device_type_name
         )
         print(json.dumps({"devices": devices}, indent=2))
 
