@@ -192,10 +192,11 @@ class ProductDB:
     # Queries
     ###########################################################################
 
-    def find_devices(self, manufacturer=None,
-                     model_number=None,
-                     serial_number=None,
-                     device_type_name=None) -> List[Dict[str, Any]]:
+    def find_devices(self,
+                     manufacturer: Optional[str] = None,
+                     model_number: Optional[str] = None,
+                     serial_number: Optional[str] = None,
+                     device_type_name: Optional[str] = None) -> List[Dict[str, Any]]:
 
         query = """
         SELECT d.*, dt.informal_name AS device_type_name
@@ -204,18 +205,22 @@ class ProductDB:
         WHERE 1=1
         """
         params = []
+
         if manufacturer:
-            query += " AND d.manufacturer_name = ?"
-            params.append(manufacturer)
+            query += " AND d.manufacturer_name LIKE ?"
+            params.append(f"%{manufacturer}%")
+
         if model_number:
-            query += " AND d.model_number = ?"
-            params.append(model_number)
+            query += " AND d.model_number LIKE ?"
+            params.append(f"%{model_number}%")
+
         if serial_number:
-            query += " AND d.serial_number = ?"
-            params.append(serial_number)
+            query += " AND d.serial_number LIKE ?"
+            params.append(f"%{serial_number}%")
+
         if device_type_name:
-            query += " AND dt.informal_name = ?"
-            params.append(device_type_name)
+            query += " AND dt.informal_name LIKE ?"
+            params.append(f"%{device_type_name}%")
 
         rows = self.conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
@@ -248,10 +253,10 @@ def main():
 
     # find-device
     p = sub.add_parser("find-device")
-    p.add_argument("--manufacturer")
-    p.add_argument("--model")
-    p.add_argument("--serial")
-    p.add_argument("--device-type-name", help="Match device_type.informal_name")
+    p.add_argument("--manufacturer", help="Filter by manufacturer (partial match)")
+    p.add_argument("--model", help="Filter by model_number (partial match)")
+    p.add_argument("--serial", help="Filter by serial_number (partial match)")
+    p.add_argument("--device-type-name", help="Filter by device_type.informal_name (partial match)")
 
     args = parser.parse_args()
     db = ProductDB(args.db)
