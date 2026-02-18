@@ -190,25 +190,31 @@ Product database
 
 * Device_type_attribute
     * ULID
-    * Device_type (ULID)
+    * Device_type (-> Device_type.ULID)
     * Attribute name
     * Multiplicity
+        * 1 -- required
+        * 0..1 -- optional
+        * 0..* -- optional, many allowed
+        * 1..* -- required, many allowed
 
 * Device
     * ULID
+    * Device_type (-> Device_type.ULID)
     * Manufacturer_name
     * Model_number
     * Serial_number
 
 * Device attribute
     * ULID
-    * Device (ULID)
-    * Attribute (ULID)
+    * Device (-> Device.ULID)
+    * Attribute (-> Device_type.ULID)
     * Value
 
 * History entry
     * ULID
-    * Entity (ULID)
+    * Entity (-> ULID of Device_type, Device_type_attribute, Device or Device_attribute)
     * Timestamp
-    * Operation -- formal description of what changed to what
-    * Comment
+    * Operation -- TBD -- formal description of what changed to what
+    * Comment -- informal description
+
