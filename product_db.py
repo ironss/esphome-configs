@@ -122,8 +122,12 @@ class ProductDB:
     ###########################################################################
 
     def add_device_type(self, part_number, manufacturer_name,
-                        model="", descriptor="", serial_number_spec="") -> str:
-
+                        model="", descriptor="", serial_number_spec="",
+                        attributes: Optional[List[Dict[str, str]]] = None) -> str:
+        """
+        Create a new device type.
+        attributes: list of dicts: [{"name": "Temperature", "multiplicity": "1"}, ...]
+        """
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device_type
@@ -131,6 +135,28 @@ class ProductDB:
             VALUES (?, ?, ?, ?, ?, ?)
         """, (ulid, part_number, manufacturer_name, model, descriptor, serial_number_spec))
         self._history(ulid, "CREATE_DEVICE_TYPE", f"{manufacturer_name}/{part_number}")
+
+        # Add attributes if provided
+        if attributes:
+            for attr in attributes:
+                self.add_device_type_attribute(ulid, attr["name"], attr["multiplicity"])
+
+        return ulid
+
+    def add_device_type_attribute(self, device_type_ulid: str, attribute_name: str,
+                                  multiplicity: str = "1") -> str:
+        """
+        Add a new attribute to a device type.
+        multiplicity: "1", "0..1", "0..*", "1..*"
+        """
+        ulid = new_ulid()
+        self.conn.execute("""
+            INSERT INTO device_type_attribute
+            (ulid, device_type, attribute_name, multiplicity)
+            VALUES (?, ?, ?, ?)
+        """, (ulid, device_type_ulid, attribute_name, multiplicity))
+        self._history(device_type_ulid, "ADD_DEVICE_TYPE_ATTRIBUTE",
+                      f"{attribute_name} ({multiplicity})")
         return ulid
 
     def get_device_type_by_part(self, part_number):
@@ -218,7 +244,6 @@ class ProductDB:
         rows = self.conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
 
-
 ###############################################################################
 # CLI
 ###############################################################################
@@ -235,6 +260,14 @@ def main():
     p.add_argument("--model", default="")
     p.add_argument("--descriptor", default="")
     p.add_argument("--serial-spec", default="")
+    p.add_argument("--attribute", action="append", nargs=2, metavar=("NAME", "MULTIPLICITY"),
+                   help="Add device_type attribute: NAME MULTIPLICITY (can specify multiple)")
+
+    # add attribute to existing device type
+    p = sub.add_parser("add-device-type-attribute")
+    p.add_argument("--part-number", required=True)
+    p.add_argument("--attribute", required=True, nargs=2, metavar=("NAME", "MULTIPLICITY"),
+                   help="Add device_type attribute to existing device type")
 
     # create-device
     p = sub.add_parser("create-device")
@@ -257,14 +290,29 @@ def main():
     ###########################################################################
 
     if args.command == "add-device-type":
+        attrs = []
+        if args.attribute:
+            for name, mult in args.attribute:
+                attrs.append({"name": name, "multiplicity": mult})
         ulid = db.add_device_type(
             args.part_number,
             args.manufacturer,
             args.model,
             args.descriptor,
-            args.serial_spec
+            args.serial_spec,
+            attributes=attrs
         )
         print(json.dumps({"device_type_ulid": ulid}, indent=2))
+
+    ###########################################################################
+
+    elif args.command == "add-device-type-attribute":
+        dt = db.get_device_type_by_part(args.part_number)
+        if not dt:
+            raise SystemExit(json.dumps({"error": "Unknown part number"}))
+        name, mult = args.attribute
+        ulid = db.add_device_type_attribute(dt["ulid"], name, mult)
+        print(json.dumps({"attribute_ulid": ulid}, indent=2))
 
     ###########################################################################
 
