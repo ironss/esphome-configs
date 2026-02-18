@@ -104,7 +104,7 @@ text_sensor:
   - platform: wifi_info
     ip_address:
       name: "IP address"
-      id: wifi_ip_addr
+      id: wifi_ipaddr
 
     ssid:
       name: "SSID"

@@ -103,12 +103,15 @@ text_sensor:
   - platform: wifi_info
     ip_address:
       name: "IP address"
+      id: wifi_ipaddr
 
     ssid:
       name: "SSID"
+      id: wifi_ssid
 
     mac_address:
       name: "MAC"
+      id: wifi_mac
 
 
 time:
