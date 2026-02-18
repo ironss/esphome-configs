@@ -213,13 +213,13 @@ class ProductDB:
         self._history(device_ulid, "ADD_DEVICE_ATTRIBUTE", f"{attribute_name}={value}")
         return ulid
 
-    def get_device_attributes(self, device_ulid: str) -> List[Dict[str, Any]]:
+    def get_device_attributes(self, device_ulid: str) -> Dict[str, str]:
         rows = self.conn.execute("""
             SELECT attribute_name, value
             FROM device_attribute
             WHERE device = ?
         """, (device_ulid,)).fetchall()
-        return [{"attribute_name": r["attribute_name"], "value": r["value"]} for r in rows]
+        return {r["attribute_name"]: r["value"] for r in rows}
 
     ###########################################################################
     # Queries
