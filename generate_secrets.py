@@ -102,19 +102,26 @@ if __name__ == '__main__':
     grname = 'esphome-devices'
     gr = kp.find_groups(name=grname, first=True)
     if not gr:
+        print("%s: create group" % grname, file=sys.stderr)
         gr = kp.add_group(kp.root_group, group_name=grname)
 
     en = kp.find_entries(path=(grname, dev_id), first=True)
     if not en:
-        gr = kp.find_groups(name=grname, first=True)
+        print("%s: create entry" % dev_id, file=sys.stderr)
         en = kp.add_entry(gr, title=dev_id, username=dev_id, password="")
+    else:
+        print("%s: entry exists" % dev_id, file=sys.stderr)
 
     dirty = False
     properties = {}
     for prop, gen in expected_properties.items():
         if prop not in en.custom_properties:
+            print("%s: create property" % prop, file=sys.stderr)
             en.set_custom_property(prop, gen())
             dirty = True
+        else:
+            print("%s: property exists" % prop, file=sys.stderr)
+        
         properties[prop] = en.custom_properties[prop]
 
     if dirty:
