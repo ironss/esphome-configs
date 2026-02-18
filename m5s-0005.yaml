@@ -26,20 +26,8 @@ substitutions:
 esphome:
   name: ${device_id}
   friendly_name: ${device_name}
-  includes:
-    - vc_version.h
-    - build_details.h
-
   on_boot:
     then:
-      - lambda: |-
-          id(g_bootcount) += 1;
-          id(bootcount).publish_state(id(g_bootcount));
-
-      - lambda: |-
-          id(firmware_version).publish_state(FW_VERSION);
-          id(build_ulid).publish_state(BUILD_ULID);
-
       - output.turn_on:
           id: lcd_bl
 
@@ -67,42 +55,26 @@ ota:
 logger:
 
 
-globals:
-  - id: g_bootcount
-    type: int
-    initial_value: '0'
-    restore_value: yes
-
-
 packages:
-  core_hw: !include
+  m5core: !include
     file: m5stack-core.yaml
     vars:
       invert_colors: false
 
-  base: !include
+  m5base: !include
     file: m5stack-relay.yaml
+
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
 
   fonts: !include
     file: fonts-m5stack.yaml
 
-  wifi: !include
-    file: wifi-common.yaml
-
 
 wifi:
-  id: wifi1
-  fast_connect: true
-  enable_btm: true
-  enable_rrm: true
-
-  networks:
-    - ssid: !secret wifi-1-ssid
-      password: !secret wifi-1-psk
-
-    - ssid: !secret wifi-2-ssid
-      password: !secret wifi-2-ssid
-
   ap:
     ssid: ${ap_ssid}
     password: ${ap_psk}
@@ -129,26 +101,12 @@ wifi:
           text: " "
 
 
-debug:
-  update_interval: 10s
-
-
 time:
   - platform: homeassistant
     id: ha_time
 
 
 text_sensor:
-  - platform: template
-    id: firmware_version
-    name: "Firmware version"
-    entity_category: diagnostic
-
-  - platform: template
-    id: build_ulid
-    name: "Build ULID"
-    entity_category: diagnostic
-
   - platform: wifi_info
     ip_address:
       name: "IP address"
@@ -194,30 +152,6 @@ sensor:
               format: "%.1f"
               args:
                 - x
-
-  - platform: uptime
-    id: uptime_s
-    type: seconds
-    name: Uptime Sensor
-
-  - platform: debug
-    free:
-      name: "Heap free"
-    fragmentation:
-      name: "Heap fragmentation"
-    block:
-      name: "Heap max block"
-    loop_time:
-      name: "Loop time"
-
-  - platform: template
-    id: bootcount
-    name: "Bootcount"
-    entity_category: diagnostic
-    lambda: |-
-      return id(g_bootcount);
-    accuracy_decimals: 0
-    update_interval: never
 
 
 binary_sensor:

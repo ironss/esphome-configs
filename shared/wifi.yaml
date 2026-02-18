@@ -1,0 +1,15 @@
+# ESPHome configuration: shared wifi
+# Copyright © Stephen Irons 2026
+
+wifi:
+  id: wifi1
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true
+
+  networks:
+    - ssid: !secret wifi-1-ssid
+      password: !secret wifi-1-psk
+
+    - ssid: !secret wifi-2-ssid
+      password: !secret wifi-2-ssid

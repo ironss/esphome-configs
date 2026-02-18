@@ -1,0 +1,67 @@
+# ESPHome configuration: shared debug
+# Copyright © Stephen Irons 2026
+
+
+esphome:
+  includes:
+    - vc_version.h
+    - build_details.h
+
+  on_boot:
+    then:
+      - lambda: |-
+          id(g_bootcount) += 1;
+          id(bootcount).publish_state(id(g_bootcount));
+
+      - lambda: |-
+          id(firmware_version).publish_state(FW_VERSION);
+          id(build_ulid).publish_state(BUILD_ULID);
+
+
+globals:
+  - id: g_bootcount
+    type: int
+    initial_value: '0'
+    restore_value: yes
+
+
+debug:
+  update_interval: 10s
+
+
+sensor:
+  - platform: uptime
+    id: uptime_s
+    type: seconds
+    name: Uptime Sensor
+
+  - platform: debug
+    free:
+      name: "Heap free"
+    fragmentation:
+      name: "Heap fragmentation"
+    block:
+      name: "Heap max block"
+    loop_time:
+      name: "Loop time"
+
+  - platform: template
+    id: bootcount
+    name: "Bootcount"
+    entity_category: diagnostic
+    lambda: |-
+      return id(g_bootcount);
+    accuracy_decimals: 0
+    update_interval: never
+
+
+text_sensor:
+  - platform: template
+    id: firmware_version
+    name: "Firmware version"
+    entity_category: diagnostic
+
+  - platform: template
+    id: build_ulid
+    name: "Build ULID"
+    entity_category: diagnostic

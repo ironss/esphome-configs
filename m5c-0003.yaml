@@ -46,6 +46,17 @@ ota:
 logger:
 
 
+packages:
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
+  fonts: !include
+    file: fonts-m5stick.yaml
+
+
 external_components:
   # AXP192 power management needed to turn TFT power on
   - source: github://martydingo/esphome-axp192
@@ -53,18 +64,6 @@ external_components:
 
 
 wifi:
-  id: wifi1
-  fast_connect: true
-  enable_btm: true
-  enable_rrm: true
-
-  networks:
-    - ssid: !secret wifi-1-ssid
-      password: !secret wifi-1-psk
-
-    - ssid: !secret wifi-2-ssid
-      password: !secret wifi-2-ssid
-
   ap:
     ssid: ${ap_ssid}
     password: ${ap_psk}
@@ -106,9 +105,11 @@ binary_sensor:
       then:
         - light.turn_off: led1
 
+
 spi:
   clk_pin: GPIO13
   mosi_pin: GPIO15
+
 
 display:
   - platform: st7735
@@ -158,25 +159,12 @@ interval:
       - component.update: disp_1
 
 
-font:
-  - file: "fonts/X11/75dpi/helvR10.bdf"
-    id: text_normal
-
-  - file: "fonts/X11/75dpi/helvB10.bdf"
-    id: text_bold
-
-  - file: "fonts/X11/75dpi/helvB12.bdf"
-    id: heading
-
-  - file: "fonts/X11/75dpi/helvR08.bdf"
-    id: text_tiny
-
-
 i2c:
   - id: bus_a
     sda: GPIO21
     scl: GPIO22
     scan: true
+
 
 sensor:
   - platform: axp192
@@ -191,7 +179,3 @@ sensor:
   - platform: wifi_signal
     name: WiFi Level
     id: wifi_dBm
-
-  - platform: uptime
-    name: Uptime
-    id: uptime_s
