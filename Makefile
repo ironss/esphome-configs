@@ -7,7 +7,7 @@
 # * device public details
 # * device secrets
 
-DEVICE_ID := $(DEVICE_ID)
+DEVICE_ID := $(subst .yaml,,$(DEVICE_ID))
 DEVICE_UART := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_uart"]')
 
 BUILD_DIR := .
@@ -33,11 +33,11 @@ VC_BRANCH_VERSION := $(shell git status > /dev/null; git describe --tags --exact
 
 FW_VERSION := $(VC_VERSION).$(BUILD_ID)
 
-vc-version: $(BUILD_DIR)/vc_version.h $(BUILD_DIR)/build_details.h
-	@echo $(FW_VERSION)
+vc-version: echo-vc-version $(BUILD_DIR)/vc_version.h $(BUILD_DIR)/build_details.h
 .PHONY: vc-version
 
 echo-vc-version:
+	@echo $(DEVICE_ID)
 	@echo $(FW_VERSION)
 .PHONY: echo-vc-version
 
