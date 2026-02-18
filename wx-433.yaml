@@ -8,7 +8,7 @@
 
 
 packages:
-  rtl_433: github://juanboro/esphome-rtl_433-decoder/rtl_433.yaml
+  rtl_433: github://ironss/esphome-rtl_433-decoder/rtl_433.yaml
 
 
 rtl_433:
