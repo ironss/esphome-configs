@@ -8,7 +8,7 @@ substitutions:
   device_part_number: 99-9001-0002-00
   device_model: M5Dial
   device_serial: 99-9001-0006
-  device_uart: "dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_C0:4E:30:12:AF:94-if00"
+  device_uart: "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_C0:4E:30:12:AF:94-if00"
   device_ipaddr: "192.168.1.126"
   device_hostname: m5d-0006.local
   device_uuid: d16a1546-bea3-409c-8c0d-46213c581849
@@ -24,8 +24,7 @@ esphome:
   friendly_name: ${device_name}
   platformio_options:
     board_build.flash_mode: dio
-    upload_port: ${device_uart}
-    
+
   on_boot:
     then:
       - pcf8563.read_time:

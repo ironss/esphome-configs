@@ -8,7 +8,7 @@
 # * device secrets
 
 DEVICE_ID := $(DEVICE_ID)
-DEVICE_UART := $(DEVICE_UART)
+DEVICE_UART := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_uart"]')
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
@@ -87,9 +87,9 @@ compile: $(DEVICE_ID).yaml vc-version secrets.yaml
 .PHONY: compile
 
 run: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) run $<
+	$(ESPHOME_BIN) run $< --device  $(DEVICE_UART)
 .PHONY: run
 
 logs: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) logs $<
+	$(ESPHOME_BIN) logs $< -- device $(DEVICE_UART)
 .PHONY: logs

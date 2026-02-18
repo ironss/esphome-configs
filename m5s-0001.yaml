@@ -20,6 +20,8 @@ substitutions:
 
   ha_api_key: !secret m5s-0001-ha_api_key
   ota_password: !secret m5s-0001-ota_password
+  ap_ssid: !secret m5s-0001-ap_ssid
+  ap_psk: !secret m5s-0001-ap_psk
   http_api_key1: !secret m5s-0001-tb_api_key
 
 
@@ -31,7 +33,6 @@ esphome:
     - build_details.h
 
   platformio_options:
-    upload_port: ${device_uart}
     build_flags:
       - -DMY_RTL433_DEVICES=DECL\\(fineoffset_wh1080\\)
 
