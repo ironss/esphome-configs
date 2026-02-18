@@ -6,7 +6,7 @@ Application
 
 [ ] 433 MHz weather station receiver
     [X] Use 433 MHz SX1275 (LoRa chip)
-    [ ] Remove unwanted decoders from RTL-433 to speed it up
+    [X] Remove unwanted decoders from RTL-433 to speed it up
     [ ] Use macros (or something) to simplify LVGL UI definition
     [ ] NO: Send data to Thingsboard (MQTT publish): it was quite unreliable
     [X] Send data to Thingsboard (HTTP post)
@@ -30,24 +30,25 @@ ESPHome
 
 [X] Move secrets into secrets file
 
-[ ] Secrets stored in Keepass—use pykeepass to access password safe.
-    [ ] Store secrets as JSON in notes
-    [ ] Or as custom attributes.
-    [ ] Lock keepass database to Ubikey or similar
-
 [ ] Database of other device-specific; Keepass will work, but means the secret storage is used for non-secret stuff
     [ ] Needs a nice front-end
     [ ] Raw database viewer-editor
     [ ] Application-specific editor
     [ ] SQLite database, with a nice viewer-editor
+    [ ] In the yaml file
 
-[ ] Bunch of scripts to build a thing. I use two or three recipes
-    [ ] Compile, deploy and log
-    [ ] Log only
-    [ ] Compile only
-
-[ ] Inject git version number into build
-
+[ ] Bunch of scripts to build a thing. I use two or three recipes -- Makefile
+    [X] Run - compile, deploy and log
+    [X] Log only
+    [X] Compile only
+    [X] Inject git version number into build
+    [X] Create secrets in keepass database if they don't exist
+    [X] Read secrets from keepass database if they do
+    [X] Store per-device details in device yaml file
+    [ ] Find a better way than yq to extract DEVICE_UART from yaml file
+    [ ] secrets.yaml is overwritten for each device---this shared file prevents building multiple device in parallel
+    [ ] Can we !include device-specific secrets file in secrets.yaml? 
+    
 [ ] Find out how to modularise the configuration
     [X] Fixed values
     [ ] Substitutable (parameterised) values
@@ -97,11 +98,12 @@ ESP32 devices
     [X] Fonts
     [X] Backlight seems a bit dim -- probably a hardware problem
 
-[ ] M5Knob
+[X] M5Knob
 
 [ ] CB2S (Arlec switch/power-meter)
 
 [ ]
+
 
 Sensor hardware devices
 =======================
@@ -112,3 +114,4 @@ Sensor hardware devices
 [X] LPS25HW module
 [X] OOK decoder
 [X] RTL_433 decoder
+
