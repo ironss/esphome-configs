@@ -1,6 +1,7 @@
 sensor:
   - platform: lps22
     id: ${lps22_id}
+    i2c_id: ${lps22_i2c_bus}
     address: ${lps22_i2c_addr}
 
     pressure:
