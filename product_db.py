@@ -6,7 +6,8 @@ import os
 import re
 import time
 import threading
-from datetime import datetime
+import json
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 
 ###############################################################################
@@ -36,7 +37,6 @@ def new_ulid() -> str:
         else:
             _last_timestamp = ts
             _last_random = int.from_bytes(os.urandom(10), "big")
-
         ulid_int = (ts << 80) | (_last_random & ((1 << 80) - 1))
         return _encode_base32(ulid_int, 26)
 
@@ -48,13 +48,12 @@ def new_ulid() -> str:
 class ProductDB:
 
     def __init__(self, db_path: str = "product.db"):
-        self.conn = sqlite3.connect(db_path)
+        self.conn = sqlite3.connect(db_path, isolation_level=None)  # autocommit disabled during transactions
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self._create_schema()
 
     def _create_schema(self):
-
         self.conn.executescript("""
         CREATE TABLE IF NOT EXISTS device_type (
             ulid TEXT PRIMARY KEY,
@@ -78,9 +77,8 @@ class ProductDB:
             device_type TEXT NOT NULL,
             manufacturer_name TEXT NOT NULL,
             model_number TEXT NOT NULL,
-            serial_number TEXT NOT NULL,
-            FOREIGN KEY(device_type) REFERENCES device_type(ulid),
-            UNIQUE(serial_number)
+            serial_number TEXT NOT NULL UNIQUE,
+            FOREIGN KEY(device_type) REFERENCES device_type(ulid)
         );
 
         CREATE TABLE IF NOT EXISTS device_attribute (
@@ -101,13 +99,12 @@ class ProductDB:
         );
         """)
 
-        self.conn.commit()
-
     ###########################################################################
     # History
     ###########################################################################
 
     def _history(self, entity_ulid: str, operation: str, comment: str = ""):
+        timestamp = datetime.now(timezone.utc).isoformat()
         self.conn.execute("""
             INSERT INTO history_entry
             (ulid, entity_ulid, timestamp, operation, comment)
@@ -115,18 +112,17 @@ class ProductDB:
         """, (
             new_ulid(),
             entity_ulid,
-            datetime.utcnow().isoformat(),
+            timestamp,
             operation,
             comment
         ))
-        self.conn.commit()
 
     ###########################################################################
     # Device Type
     ###########################################################################
 
     def add_device_type(self, model_number, informal_name,
-                        descriptor="", serial_number_spec=""):
+                        descriptor="", serial_number_spec="") -> str:
 
         ulid = new_ulid()
         self.conn.execute("""
@@ -134,15 +130,12 @@ class ProductDB:
             VALUES (?, ?, ?, ?, ?)
         """, (ulid, model_number, informal_name,
               descriptor, serial_number_spec))
-        self.conn.commit()
-
         self._history(ulid, "CREATE_DEVICE_TYPE", model_number)
         return ulid
 
     def get_device_type_by_model(self, model_number):
         row = self.conn.execute("""
-            SELECT * FROM device_type
-            WHERE model_number = ?
+            SELECT * FROM device_type WHERE model_number = ?
         """, (model_number,)).fetchone()
         return row
 
@@ -151,42 +144,30 @@ class ProductDB:
     ###########################################################################
 
     def _generate_next_serial(self, device_type_ulid: str) -> str:
-
         row = self.conn.execute("""
-            SELECT serial_number_spec
-            FROM device_type
-            WHERE ulid = ?
+            SELECT serial_number_spec FROM device_type WHERE ulid = ?
         """, (device_type_ulid,)).fetchone()
-
         if not row or not row["serial_number_spec"]:
             raise ValueError("No serial_number_spec defined")
 
         spec = row["serial_number_spec"]
-
         match = re.search(r"\{(\d+)\}", spec)
         if not match:
             raise ValueError("serial_number_spec must contain {n}")
-
         width = int(match.group(1))
         prefix = spec[:match.start()]
         suffix = spec[match.end():]
 
+        # Find highest existing number
         rows = self.conn.execute("""
-            SELECT serial_number
-            FROM device
-            WHERE device_type = ?
+            SELECT serial_number FROM device WHERE device_type = ?
         """, (device_type_ulid,)).fetchall()
-
         max_num = 0
-        pattern = re.compile(
-            re.escape(prefix) + r"(\d+)" + re.escape(suffix)
-        )
-
+        pattern = re.compile(re.escape(prefix) + r"(\d+)" + re.escape(suffix))
         for r in rows:
             m = pattern.fullmatch(r["serial_number"])
             if m:
                 max_num = max(max_num, int(m.group(1)))
-
         next_num = max_num + 1
         return f"{prefix}{str(next_num).zfill(width)}{suffix}"
 
@@ -195,25 +176,17 @@ class ProductDB:
     ###########################################################################
 
     def add_device(self, device_type_ulid, manufacturer,
-                   model_number, serial_number):
+                   model_number, serial_number) -> str:
 
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device
             VALUES (?, ?, ?, ?, ?)
-        """, (ulid, device_type_ulid,
-              manufacturer, model_number, serial_number))
-        self.conn.commit()
-
+        """, (ulid, device_type_ulid, manufacturer,
+              model_number, serial_number))
         self._history(ulid, "CREATE_DEVICE",
                       f"{manufacturer}/{model_number}/{serial_number}")
         return ulid
-
-    def serial_exists(self, serial_number):
-        row = self.conn.execute("""
-            SELECT 1 FROM device WHERE serial_number = ?
-        """, (serial_number,)).fetchone()
-        return row is not None
 
     ###########################################################################
     # Queries
@@ -221,23 +194,19 @@ class ProductDB:
 
     def find_devices(self, manufacturer=None,
                      model_number=None,
-                     serial_number=None):
+                     serial_number=None) -> List[Dict[str, Any]]:
 
         query = "SELECT * FROM device WHERE 1=1"
         params = []
-
         if manufacturer:
             query += " AND manufacturer_name = ?"
             params.append(manufacturer)
-
         if model_number:
             query += " AND model_number = ?"
             params.append(model_number)
-
         if serial_number:
             query += " AND serial_number = ?"
             params.append(serial_number)
-
         rows = self.conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
 
@@ -247,10 +216,8 @@ class ProductDB:
 ###############################################################################
 
 def main():
-
     parser = argparse.ArgumentParser(description="Product Database CLI")
     parser.add_argument("--db", default="product.db")
-
     sub = parser.add_subparsers(dest="command", required=True)
 
     # add-device-type
@@ -264,6 +231,7 @@ def main():
     p = sub.add_parser("create-device")
     p.add_argument("--model", required=True)
     p.add_argument("--manufacturer", required=True)
+    p.add_argument("--count", type=int, default=1)
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--serial")
     group.add_argument("--next-serial", action="store_true")
@@ -286,43 +254,45 @@ def main():
             args.descriptor,
             args.serial_spec
         )
-        print("Created device_type:", ulid)
+        print(json.dumps({"device_type_ulid": ulid}, indent=2))
 
     ###########################################################################
 
     elif args.command == "create-device":
-
         dt = db.get_device_type_by_model(args.model)
         if not dt:
-            raise SystemExit("Unknown model")
+            raise SystemExit(json.dumps({"error": "Unknown model"}))
 
-        if args.next_serial:
-            serial = db._generate_next_serial(dt["ulid"])
-        else:
-            serial = args.serial
-            if db.serial_exists(serial):
-                raise SystemExit("Serial number already exists")
+        created = []
+        try:
+            db.conn.execute("BEGIN")  # Transaction start
+            for _ in range(args.count):
+                if args.next_serial:
+                    serial = db._generate_next_serial(dt["ulid"])
+                else:
+                    serial = args.serial
+                    if db.conn.execute(
+                        "SELECT 1 FROM device WHERE serial_number = ?",
+                        (serial,)
+                    ).fetchone():
+                        raise SystemExit(json.dumps({"error": "Serial exists"}))
+                ulid = db.add_device(dt["ulid"], args.manufacturer,
+                                     args.model, serial)
+                created.append({"device_ulid": ulid, "serial": serial})
+            db.conn.execute("COMMIT")
+        except Exception as e:
+            db.conn.execute("ROLLBACK")
+            raise
 
-        ulid = db.add_device(
-            dt["ulid"],
-            args.manufacturer,
-            args.model,
-            serial
-        )
-
-        print("Created device:", ulid)
-        print("Serial:", serial)
+        print(json.dumps({"created": created}, indent=2))
 
     ###########################################################################
 
     elif args.command == "find-device":
         devices = db.find_devices(
-            args.manufacturer,
-            args.model,
-            args.serial
+            args.manufacturer, args.model, args.serial
         )
-        for d in devices:
-            print(d)
+        print(json.dumps({"devices": devices}, indent=2))
 
 
 if __name__ == "__main__":
