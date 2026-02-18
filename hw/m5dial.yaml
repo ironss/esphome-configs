@@ -1,0 +1,79 @@
+# Configuration for M5Dial
+# Copyright © Stephen Irons 2026
+
+
+external_components:
+  # AXP192 power management needed to turn TFT power on
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
+
+
+binary_sensor:
+  - platform: gpio
+    name: Button
+    id: front_button
+    pin: GPIO42
+    filters:
+      - invert:
+
+
+display:
+  - platform: ili9xxx
+    id: disp_A
+    model: GC9A01A
+    cs_pin: GPIO7
+    reset_pin: GPIO8
+    dc_pin: GPIO4
+    invert_colors: false
+
+
+i2c:
+  - id: i2c_A
+    sda: GPIO11
+    scl: GPIO12
+
+
+output:
+  - platform: ledc
+    pin: GPIO3
+    id: buzzer
+
+  - platform: ledc
+    pin: GPIO9
+    id: backlight_output
+
+
+rc522_i2c:
+  - id: nfc_reader
+    i2c_id: i2c_A
+    address: 0x28
+
+
+sensor:
+  - platform: rotary_encoder
+    id: encoder
+    name: Encoder
+    pin_a: GPIO40
+    pin_b: GPIO41
+
+
+spi:
+  id: spi_A
+  mosi_pin: GPIO5
+  clk_pin: GPIO6
+
+
+time:
+  - platform: pcf8563
+    id: rtctime
+    i2c_id: i2c_A
+    address: 0x51
+    update_interval: never
+
+
+touchscreen:
+  - platform: ft5x06
+    id: touch
+    i2c_id: i2c_A
+    address: 0x38
+    # interrupt_pin: GPIO14  # not supported by this component

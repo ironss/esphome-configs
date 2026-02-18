@@ -1,0 +1,11 @@
+id: ${page_id}
+lambda: |-
+  it.printf(2, 20, id(heading), TextAlign::BASELINE_LEFT, "${page_title}");
+
+  it.printf(2, 31, id(text_normal), TextAlign::BASELINE_LEFT, "SSID");
+  it.printf(120, 31, id(text_bold), TextAlign::BASELINE_RIGHT, "id(wifi_ssid).c_str()");
+  it.printf(128, 31, id(text_normal), TextAlign::BASELINE_LEFT, " ");
+
+  it.printf(2, 46, id(text_normal), TextAlign::BASELINE_LEFT, "RSSI");
+  it.printf(120, 46, id(text_bold), TextAlign::BASELINE_RIGHT, "id(wifi_dBm).state");
+  it.printf(128, 46, id(text_normal), TextAlign::BASELINE_LEFT, "dBm");

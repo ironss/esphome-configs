@@ -1,6 +1,10 @@
 # ESPHome configuration for M5D-0006
 # Copyright © Stephen Irons 2026
 
+# Hardware
+# * M5Dial
+
+
 substitutions:
   device_id: m5d-0006
   device_name: M5D-0006
@@ -49,34 +53,28 @@ ota:
 logger:
 
 
+packages:
+  core_hw: !include
+    file: hw/m5dial.yaml
+
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
+  fonts: !include
+    file: fonts-m5stick.yaml
+
+
 wifi:
-  id: wifi1
-  fast_connect: true
-  enable_btm: true
-  enable_rrm: true
-
-  networks:
-    - ssid: !secret wifi-1-ssid
-      password: !secret wifi-1-psk
-
-    - ssid: !secret wifi-2-ssid
-      password: !secret wifi-2-ssid
-
   ap:
     ssid: ${ap_ssid}
     password: ${ap_psk}
 
 
-i2c:
-  - id: internal_i2c
-    sda: GPIO11
-    scl: GPIO12
-
-
 rc522_i2c:
-  - id: nfc_reader
-    i2c_id: internal_i2c
-    address: 0x28
+  - id: !extend nfc_reader
     on_tag:
       then:
         - globals.set:
@@ -86,7 +84,7 @@ rc522_i2c:
             id: tag_result
             value: !lambda 'if (x == "2A-71-23-3A") return "OK"; else return "No";'
         - display.page.show: page_scan
-        - component.update: disp_1
+        - component.update: disp_A
         - light.turn_on: display_backlight
         - if:
             condition:
@@ -95,86 +93,21 @@ rc522_i2c:
               rtttl.play: "scan-allow:d=4,o=5,b=120:32c,32g,32b"
             else:
               rtttl.play: "scan-deny:d=4,o=5,b=120:8c4"
-            
+
         - homeassistant.tag_scanned: !lambda 'return x;'
-
-
-output:
-  - platform: ledc
-    pin: GPIO3
-    id: buzzer
-
-  - platform: ledc
-    pin: GPIO9
-    id: backlight_output
 
 
 rtttl:
   output: buzzer
 
 
-sensor:
-  - platform: rotary_encoder
-    id: encoder
-    name: Encoder
-    pin_a: GPIO40
-    pin_b: GPIO41
-
-  - platform: uptime
-    name: Uptime
-    id: uptime_s
-
 time:
-  # RTC
-  - platform: pcf8563
-    id: rtctime
-    i2c_id: internal_i2c
-    address: 0x51
-    update_interval: never
-
   - platform: homeassistant
     id: esptime
     on_time_sync:
       then:
         - pcf8563.write_time:
 
-
-binary_sensor:
-  - platform: gpio
-    name: Button
-    id: front_button
-    pin: GPIO42
-    filters:
-      - invert:
-
-
-spi:
-  id: spi_bus
-  mosi_pin: GPIO5
-  clk_pin: GPIO6
-
-
-display:
-  - platform: ili9xxx
-    id: disp_1
-    model: GC9A01A
-    cs_pin: GPIO7
-    reset_pin: GPIO8
-    dc_pin: GPIO4
-    invert_colors: false
-
-    pages:
-      - !include
-          file: page-diag-simple.yaml
-          vars:
-            page_id: page_diag
-            page_title: "Diagnostics"
-
-      - !include
-          file: page-scan-simple.yaml
-          vars:
-            page_id: page_scan
-            page_title: "Scan"
 
 #      - id: page_wifi
 #        lambda: |-
@@ -186,28 +119,6 @@ display:
 #    then:
 #      - display.page.show_next: disp_1
 #      - component.update: disp_1
-
-
-font:
-  - file: "fonts/X11/75dpi/helvR10.bdf"
-    id: text_normal
-
-  - file: "fonts/X11/75dpi/helvB10.bdf"
-    id: text_bold
-
-  - file: "fonts/X11/75dpi/helvB12.bdf"
-    id: heading
-
-  - file: "fonts/X11/75dpi/helvR08.bdf"
-    id: text_tiny
-
-
-touchscreen:
-  - platform: ft5x06
-    id: touch
-    i2c_id: internal_i2c
-    address: 0x38
-    # interrupt_pin: GPIO14  # not supported by this component
 
 
 light:
@@ -235,3 +146,18 @@ globals:
     # max_restore_data_length: 24
     initial_value: '"--"'
 
+
+display:
+  - id: !extend disp_A
+    pages:
+      - !include
+          file: page-diag-simple.yaml
+          vars:
+            page_id: page_diag
+            page_title: "Diagnostics"
+
+      - !include
+          file: page-scan-simple.yaml
+          vars:
+            page_id: page_scan
+            page_title: "Scan"
