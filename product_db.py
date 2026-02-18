@@ -84,7 +84,7 @@ class ProductDB:
         CREATE TABLE IF NOT EXISTS device_attribute (
             ulid TEXT PRIMARY KEY,
             device TEXT NOT NULL,
-            attribute_type TEXT NOT NULL,
+            attribute_type TEXT,
             attribute_name TEXT NOT NULL,
             value TEXT,
             FOREIGN KEY(device) REFERENCES device(ulid) ON DELETE CASCADE
@@ -210,6 +210,28 @@ class ProductDB:
         self._history(ulid, "CREATE_DEVICE", f"{part_number}/{serial_number}")
         return ulid
 
+    def add_device_attribute(self, device_ulid: str, attribute_name: str,
+                             value: str, attribute_type: Optional[str] = None) -> str:
+        """
+        Add an attribute to a device.
+        """
+        ulid = new_ulid()
+        self.conn.execute("""
+            INSERT INTO device_attribute
+            (ulid, device, attribute_name, value, attribute_type)
+            VALUES (?, ?, ?, ?, ?)
+        """, (ulid, device_ulid, attribute_name, value, attribute_type))
+        self._history(device_ulid, "ADD_DEVICE_ATTRIBUTE", f"{attribute_name}={value}")
+        return ulid
+
+    def get_device_attributes(self, device_ulid: str) -> List[Dict[str, Any]]:
+        rows = self.conn.execute("""
+            SELECT attribute_name, value
+            FROM device_attribute
+            WHERE device = ?
+        """, (device_ulid,)).fetchall()
+        return [{"attribute_name": r["attribute_name"], "value": r["value"]} for r in rows]
+
     ###########################################################################
     # Queries
     ###########################################################################
@@ -242,7 +264,6 @@ class ProductDB:
             params.append(f"%{model}%")
 
         rows = self.conn.execute(query, params).fetchall()
-
         devices = []
         for r in rows:
             device = {
@@ -255,16 +276,7 @@ class ProductDB:
                 "attributes": self.get_device_attributes(r["ulid"])
             }
             devices.append(device)
-
         return devices
-
-    def get_device_attributes(self, device_ulid: str) -> List[Dict[str, Any]]:
-        rows = self.conn.execute("""
-            SELECT attribute_name, value
-            FROM device_attribute
-            WHERE device = ?
-        """, (device_ulid,)).fetchall()
-        return [{"attribute_name": r["attribute_name"], "value": r["value"]} for r in rows]
 
 ###############################################################################
 # CLI
@@ -295,9 +307,17 @@ def main():
     p = sub.add_parser("create-device")
     p.add_argument("--part-number", required=True)
     p.add_argument("--count", type=int, default=1)
+    p.add_argument("--attribute", action="append", nargs=2, metavar=("NAME", "VALUE"),
+                   help="Add device attribute: NAME VALUE (can specify multiple times)")
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--serial")
     group.add_argument("--next-serial", action="store_true")
+
+    # add attribute to existing device
+    p = sub.add_parser("add-device-attribute")
+    p.add_argument("--serial", required=True, help="Device serial number")
+    p.add_argument("--attribute", required=True, nargs=2, metavar=("NAME", "VALUE"),
+                   help="Attribute to add: NAME VALUE")
 
     # find-device
     p = sub.add_parser("find-device")
@@ -356,14 +376,30 @@ def main():
                         (serial,)
                     ).fetchone():
                         raise SystemExit(json.dumps({"error": "Serial exists"}))
-                ulid = db.add_device(dt["ulid"], dt["part_number"], serial)
-                created.append({"device_ulid": ulid, "serial": serial})
+                device_ulid = db.add_device(dt["ulid"], dt["part_number"], serial)
+
+                # Add attributes if provided
+                if args.attribute:
+                    for name, value in args.attribute:
+                        db.add_device_attribute(device_ulid, name, value)
+
+                created.append({"device_ulid": device_ulid, "serial": serial})
             db.conn.execute("COMMIT")
         except Exception:
             db.conn.execute("ROLLBACK")
             raise
 
         print(json.dumps({"created": created}, indent=2))
+
+    ###########################################################################
+
+    elif args.command == "add-device-attribute":
+        device = db.conn.execute("SELECT * FROM device WHERE serial_number = ?", (args.serial,)).fetchone()
+        if not device:
+            raise SystemExit(json.dumps({"error": "Unknown device"}))
+        name, value = args.attribute
+        ulid = db.add_device_attribute(device["ulid"], name, value)
+        print(json.dumps({"attribute_ulid": ulid}, indent=2))
 
     ###########################################################################
 
