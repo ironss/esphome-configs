@@ -48,7 +48,7 @@ def new_ulid() -> str:
 class ProductDB:
 
     def __init__(self, db_path: str = "product.db"):
-        self.conn = sqlite3.connect(db_path, isolation_level=None)  # autocommit disabled during transactions
+        self.conn = sqlite3.connect(db_path, isolation_level=None)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self._create_schema()
@@ -57,8 +57,9 @@ class ProductDB:
         self.conn.executescript("""
         CREATE TABLE IF NOT EXISTS device_type (
             ulid TEXT PRIMARY KEY,
-            model_number TEXT NOT NULL UNIQUE,
-            informal_name TEXT,
+            part_number TEXT NOT NULL UNIQUE,
+            manufacturer_name TEXT NOT NULL,
+            model TEXT,
             descriptor TEXT,
             serial_number_spec TEXT
         );
@@ -75,8 +76,7 @@ class ProductDB:
         CREATE TABLE IF NOT EXISTS device (
             ulid TEXT PRIMARY KEY,
             device_type TEXT NOT NULL,
-            manufacturer_name TEXT NOT NULL,
-            model_number TEXT NOT NULL,
+            part_number TEXT NOT NULL,
             serial_number TEXT NOT NULL UNIQUE,
             FOREIGN KEY(device_type) REFERENCES device_type(ulid)
         );
@@ -121,22 +121,22 @@ class ProductDB:
     # Device Type
     ###########################################################################
 
-    def add_device_type(self, model_number, informal_name,
-                        descriptor="", serial_number_spec="") -> str:
+    def add_device_type(self, part_number, manufacturer_name,
+                        model="", descriptor="", serial_number_spec="") -> str:
 
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device_type
-            VALUES (?, ?, ?, ?, ?)
-        """, (ulid, model_number, informal_name,
-              descriptor, serial_number_spec))
-        self._history(ulid, "CREATE_DEVICE_TYPE", model_number)
+            (ulid, part_number, manufacturer_name, model, descriptor, serial_number_spec)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (ulid, part_number, manufacturer_name, model, descriptor, serial_number_spec))
+        self._history(ulid, "CREATE_DEVICE_TYPE", f"{manufacturer_name}/{part_number}")
         return ulid
 
-    def get_device_type_by_model(self, model_number):
+    def get_device_type_by_part(self, part_number):
         row = self.conn.execute("""
-            SELECT * FROM device_type WHERE model_number = ?
-        """, (model_number,)).fetchone()
+            SELECT * FROM device_type WHERE part_number = ?
+        """, (part_number,)).fetchone()
         return row
 
     ###########################################################################
@@ -158,7 +158,6 @@ class ProductDB:
         prefix = spec[:match.start()]
         suffix = spec[match.end():]
 
-        # Find highest existing number
         rows = self.conn.execute("""
             SELECT serial_number FROM device WHERE device_type = ?
         """, (device_type_ulid,)).fetchall()
@@ -175,17 +174,14 @@ class ProductDB:
     # Device
     ###########################################################################
 
-    def add_device(self, device_type_ulid, manufacturer,
-                   model_number, serial_number) -> str:
-
+    def add_device(self, device_type_ulid, part_number, serial_number) -> str:
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device
-            VALUES (?, ?, ?, ?, ?)
-        """, (ulid, device_type_ulid, manufacturer,
-              model_number, serial_number))
-        self._history(ulid, "CREATE_DEVICE",
-                      f"{manufacturer}/{model_number}/{serial_number}")
+            (ulid, device_type, part_number, serial_number)
+            VALUES (?, ?, ?, ?)
+        """, (ulid, device_type_ulid, part_number, serial_number))
+        self._history(ulid, "CREATE_DEVICE", f"{part_number}/{serial_number}")
         return ulid
 
     ###########################################################################
@@ -194,12 +190,12 @@ class ProductDB:
 
     def find_devices(self,
                      manufacturer: Optional[str] = None,
-                     model_number: Optional[str] = None,
+                     part_number: Optional[str] = None,
                      serial_number: Optional[str] = None,
-                     device_type_name: Optional[str] = None) -> List[Dict[str, Any]]:
+                     model: Optional[str] = None) -> List[Dict[str, Any]]:
 
         query = """
-        SELECT d.*, dt.informal_name AS device_type_name
+        SELECT d.*, dt.model AS model, dt.manufacturer_name
         FROM device d
         JOIN device_type dt ON d.device_type = dt.ulid
         WHERE 1=1
@@ -207,20 +203,17 @@ class ProductDB:
         params = []
 
         if manufacturer:
-            query += " AND d.manufacturer_name LIKE ?"
+            query += " AND dt.manufacturer_name LIKE ?"
             params.append(f"%{manufacturer}%")
-
-        if model_number:
-            query += " AND d.model_number LIKE ?"
-            params.append(f"%{model_number}%")
-
+        if part_number:
+            query += " AND d.part_number LIKE ?"
+            params.append(f"%{part_number}%")
         if serial_number:
             query += " AND d.serial_number LIKE ?"
             params.append(f"%{serial_number}%")
-
-        if device_type_name:
-            query += " AND dt.informal_name LIKE ?"
-            params.append(f"%{device_type_name}%")
+        if model:
+            query += " AND dt.model LIKE ?"
+            params.append(f"%{model}%")
 
         rows = self.conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
@@ -237,15 +230,15 @@ def main():
 
     # add-device-type
     p = sub.add_parser("add-device-type")
-    p.add_argument("--model", required=True)
-    p.add_argument("--name", required=True)
+    p.add_argument("--part-number", required=True)
+    p.add_argument("--manufacturer", required=True)
+    p.add_argument("--model", default="")
     p.add_argument("--descriptor", default="")
     p.add_argument("--serial-spec", default="")
 
     # create-device
     p = sub.add_parser("create-device")
-    p.add_argument("--model", required=True)
-    p.add_argument("--manufacturer", required=True)
+    p.add_argument("--part-number", required=True)
     p.add_argument("--count", type=int, default=1)
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--serial")
@@ -253,10 +246,10 @@ def main():
 
     # find-device
     p = sub.add_parser("find-device")
-    p.add_argument("--manufacturer", help="Filter by manufacturer (partial match)")
-    p.add_argument("--model", help="Filter by model_number (partial match)")
-    p.add_argument("--serial", help="Filter by serial_number (partial match)")
-    p.add_argument("--device-type-name", help="Filter by device_type.informal_name (partial match)")
+    p.add_argument("--manufacturer", help="Partial match on manufacturer_name")
+    p.add_argument("--part-number", help="Partial match on part_number")
+    p.add_argument("--serial", help="Partial match on serial_number")
+    p.add_argument("--model", help="Partial match on device_type.model")
 
     args = parser.parse_args()
     db = ProductDB(args.db)
@@ -265,8 +258,9 @@ def main():
 
     if args.command == "add-device-type":
         ulid = db.add_device_type(
+            args.part_number,
+            args.manufacturer,
             args.model,
-            args.name,
             args.descriptor,
             args.serial_spec
         )
@@ -275,13 +269,13 @@ def main():
     ###########################################################################
 
     elif args.command == "create-device":
-        dt = db.get_device_type_by_model(args.model)
+        dt = db.get_device_type_by_part(args.part_number)
         if not dt:
-            raise SystemExit(json.dumps({"error": "Unknown model"}))
+            raise SystemExit(json.dumps({"error": "Unknown part number"}))
 
         created = []
         try:
-            db.conn.execute("BEGIN")  # Transaction start
+            db.conn.execute("BEGIN")
             for _ in range(args.count):
                 if args.next_serial:
                     serial = db._generate_next_serial(dt["ulid"])
@@ -292,11 +286,10 @@ def main():
                         (serial,)
                     ).fetchone():
                         raise SystemExit(json.dumps({"error": "Serial exists"}))
-                ulid = db.add_device(dt["ulid"], args.manufacturer,
-                                     args.model, serial)
+                ulid = db.add_device(dt["ulid"], dt["part_number"], serial)
                 created.append({"device_ulid": ulid, "serial": serial})
             db.conn.execute("COMMIT")
-        except Exception as e:
+        except Exception:
             db.conn.execute("ROLLBACK")
             raise
 
@@ -307,9 +300,9 @@ def main():
     elif args.command == "find-device":
         devices = db.find_devices(
             manufacturer=args.manufacturer,
-            model_number=args.model,
+            part_number=args.part_number,
             serial_number=args.serial,
-            device_type_name=args.device_type_name
+            model=args.model
         )
         print(json.dumps({"devices": devices}, indent=2))
 
