@@ -51,6 +51,7 @@ class ProductDB:
         self.conn = sqlite3.connect(db_path, isolation_level=None)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
+        self.conn.execute("PRAGMA journal_mode = WAL")
         self._create_schema()
 
     def _create_schema(self):
