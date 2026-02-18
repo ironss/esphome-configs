@@ -124,10 +124,6 @@ class ProductDB:
     def add_device_type(self, part_number, manufacturer_name,
                         model="", descriptor="", serial_number_spec="",
                         attributes: Optional[List[Dict[str, str]]] = None) -> str:
-        """
-        Create a new device type.
-        attributes: list of dicts: [{"name": "Temperature", "multiplicity": "1"}, ...]
-        """
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device_type
@@ -145,10 +141,6 @@ class ProductDB:
 
     def add_device_type_attribute(self, device_type_ulid: str, attribute_name: str,
                                   multiplicity: str = "1") -> str:
-        """
-        Add a new attribute to a device type.
-        multiplicity: "1", "0..1", "0..*", "1..*"
-        """
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device_type_attribute
@@ -160,10 +152,10 @@ class ProductDB:
         return ulid
 
     def get_device_type_by_part(self, part_number):
-        row = self.conn.execute("""
-            SELECT * FROM device_type WHERE part_number = ?
-        """, (part_number,)).fetchone()
-        return row
+        return self.conn.execute(
+            "SELECT * FROM device_type WHERE part_number = ?",
+            (part_number,)
+        ).fetchone()
 
     ###########################################################################
     # Serial Number Logic
@@ -212,9 +204,6 @@ class ProductDB:
 
     def add_device_attribute(self, device_ulid: str, attribute_name: str,
                              value: str, attribute_type: Optional[str] = None) -> str:
-        """
-        Add an attribute to a device.
-        """
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device_attribute
@@ -295,29 +284,29 @@ def main():
     p.add_argument("--descriptor", default="")
     p.add_argument("--serial-spec", default="")
     p.add_argument("--attribute", action="append", nargs=2, metavar=("NAME", "MULTIPLICITY"),
-                   help="Add device_type attribute: NAME MULTIPLICITY (can specify multiple)")
+                   help="Add device_type attribute(s) at creation")
 
-    # add attribute to existing device type
+    # add attribute(s) to existing device type
     p = sub.add_parser("add-device-type-attribute")
     p.add_argument("--part-number", required=True)
-    p.add_argument("--attribute", required=True, nargs=2, metavar=("NAME", "MULTIPLICITY"),
-                   help="Add device_type attribute to existing device type")
+    p.add_argument("--attribute", required=True, nargs=2, action="append", metavar=("NAME", "MULTIPLICITY"),
+                   help="Add device_type attribute(s) to existing device type")
 
     # create-device
     p = sub.add_parser("create-device")
     p.add_argument("--part-number", required=True)
     p.add_argument("--count", type=int, default=1)
     p.add_argument("--attribute", action="append", nargs=2, metavar=("NAME", "VALUE"),
-                   help="Add device attribute: NAME VALUE (can specify multiple times)")
+                   help="Add device attribute(s) at creation")
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--serial")
     group.add_argument("--next-serial", action="store_true")
 
-    # add attribute to existing device
+    # add attribute(s) to existing device
     p = sub.add_parser("add-device-attribute")
     p.add_argument("--serial", required=True, help="Device serial number")
-    p.add_argument("--attribute", required=True, nargs=2, metavar=("NAME", "VALUE"),
-                   help="Attribute to add: NAME VALUE")
+    p.add_argument("--attribute", required=True, nargs=2, action="append", metavar=("NAME", "VALUE"),
+                   help="Add device attribute(s) to existing device")
 
     # find-device
     p = sub.add_parser("find-device")
@@ -352,9 +341,12 @@ def main():
         dt = db.get_device_type_by_part(args.part_number)
         if not dt:
             raise SystemExit(json.dumps({"error": "Unknown part number"}))
-        name, mult = args.attribute
-        ulid = db.add_device_type_attribute(dt["ulid"], name, mult)
-        print(json.dumps({"attribute_ulid": ulid}, indent=2))
+
+        added = []
+        for name, mult in args.attribute:
+            ulid = db.add_device_type_attribute(dt["ulid"], name, mult)
+            added.append({"attribute_ulid": ulid, "name": name, "multiplicity": mult})
+        print(json.dumps({"added_attributes": added}, indent=2))
 
     ###########################################################################
 
@@ -397,9 +389,13 @@ def main():
         device = db.conn.execute("SELECT * FROM device WHERE serial_number = ?", (args.serial,)).fetchone()
         if not device:
             raise SystemExit(json.dumps({"error": "Unknown device"}))
-        name, value = args.attribute
-        ulid = db.add_device_attribute(device["ulid"], name, value)
-        print(json.dumps({"attribute_ulid": ulid}, indent=2))
+
+        added = []
+        for name, value in args.attribute:
+            ulid = db.add_device_attribute(device["ulid"], name, value)
+            added.append({"attribute_ulid": ulid, "name": name, "value": value})
+
+        print(json.dumps({"added_attributes": added}, indent=2))
 
     ###########################################################################
 
