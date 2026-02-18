@@ -21,7 +21,7 @@ substitutions:
 
 esphome:
   name: ${device_id}
-  friendly_name: $(device_name}
+  friendly_name: ${device_name}
   platformio_options:
     upload_speed: 750000
 
