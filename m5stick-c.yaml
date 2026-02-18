@@ -1,0 +1,72 @@
+# Configuration for M5Stick C
+# Copyright © Stephen Irons 2026
+
+
+external_components:
+  # AXP192 power management needed to turn TFT power on
+  - source: github://martydingo/esphome-axp192
+    components: [axp192]
+
+
+binary_sensor:
+  - platform: gpio
+    id: btn_A
+    name: Button A
+    pin:
+      number: GPIO37
+      inverted: true
+
+  - platform: gpio
+    id: btn_B
+    name: Button B
+    pin:
+      number: GPIO39
+      inverted: true
+
+
+output:
+  - platform: ledc
+    id: led1
+    pin: GPIO10
+    inverted: true
+
+
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO15
+
+
+i2c:
+  - id: i2c_A
+    sda: GPIO21
+    scl: GPIO22
+    scan: true
+
+
+display:
+  - platform: st7735
+    id: disp_A
+    model: "INITR_MINI160X80"
+    reset_pin: GPIO18
+    cs_pin: GPIO5
+    dc_pin: GPIO23
+    rotation: 270
+    device_width: 80
+    device_height: 160
+    col_start: 26
+    row_start: 1
+    use_bgr: true
+    invert_colors: true
+    eight_bit_color: true
+    update_interval: 10s
+
+
+sensor:
+  - platform: axp192
+    model: M5STICKC
+    address: 0x34
+    i2c_id: i2c_A
+    update_interval: 30s
+    battery_level:
+      name: "Battery Level"
+      id: battery_level_pc

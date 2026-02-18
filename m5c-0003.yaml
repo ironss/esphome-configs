@@ -1,6 +1,10 @@
 # ESPHome configuration for M5C-0003
 # Copyright © Stephen Irons 2026
 
+# Hardware
+# * M5Stick-C
+
+
 substitutions:
   device_id: m5c-0003
   device_name: M5C-0003
@@ -17,6 +21,7 @@ substitutions:
   ota_password: !secret m5c-0003-ota_password
   ap_ssid: !secret m5c-0003-ap_ssid
   ap_psk: !secret m5c-0003-ap_psk
+  tb_api_key: !secret m5c-0003-tb_api_key
 
 
 esphome:
@@ -47,6 +52,9 @@ logger:
 
 
 packages:
+  core_hw: !include
+    file: m5stick-c.yaml
+
   common: !include
     file: shared/debug.yaml
 
@@ -57,77 +65,60 @@ packages:
     file: fonts-m5stick.yaml
 
 
-external_components:
-  # AXP192 power management needed to turn TFT power on
-  - source: github://martydingo/esphome-axp192
-    components: [axp192]
-
-
 wifi:
   ap:
     ssid: ${ap_ssid}
     password: ${ap_psk}
 
 
-light:
-  - platform: monochromatic
-    output: builtin_led
-    name: LED
-    id: led1
-
-
-output:
-  - platform: ledc
-    pin: GPIO10
-    inverted: true
-    id: builtin_led
-
-
 binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO37
-      inverted: true
-    name: Button A
+  - id: !extend btn_A
     on_press:
       then:
-        - light.toggle: led1
+        - light.toggle: light1
 
-  - platform: gpio
-    pin:
-      number: GPIO39
-      inverted: true
-    name: Button B
+  - id: !extend btn_B
     on_press:
       then:
-        - light.turn_on: led1
+        - light.turn_on: light1
     on_release:
       then:
-        - light.turn_off: led1
+        - light.turn_off: light1
 
 
-spi:
-  clk_pin: GPIO13
-  mosi_pin: GPIO15
+light:
+  - platform: monochromatic
+    id: light1
+    name: LED
+    output: led1
+
+
+sensor:
+  - platform: wifi_signal
+    name: WiFi Level
+    id: wifi_dBm
+    update_interval: 30s
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+
+    ssid:
+      name: "SSID"
+
+    mac_address:
+      name: "MAC"
+
+
+time:
+  - platform: homeassistant
+    id: ha_time
 
 
 display:
-  - platform: st7735
-    model: "INITR_MINI160X80"
-    reset_pin: GPIO18
-    cs_pin: GPIO5
-    dc_pin: GPIO23
-    rotation: 270
-    device_width: 80
-    device_height: 160
-    col_start: 26
-    row_start: 1
-    use_bgr: true
-    invert_colors: true
-    eight_bit_color: true
-    update_interval: 10s
-
-    id: disp_1
+  - id: !extend disp_A
     pages:
       - id: page_diagnostics
         lambda: |-
@@ -155,27 +146,5 @@ display:
 interval:
   - interval: 5s
     then:
-      - display.page.show_next: disp_1
-      - component.update: disp_1
-
-
-i2c:
-  - id: bus_a
-    sda: GPIO21
-    scl: GPIO22
-    scan: true
-
-
-sensor:
-  - platform: axp192
-    model: M5STICKC
-    address: 0x34
-    i2c_id: bus_a
-    update_interval: 30s
-    battery_level:
-      name: "Battery Level"
-      id: "battery_level_pc"
-
-  - platform: wifi_signal
-    name: WiFi Level
-    id: wifi_dBm
+      - display.page.show_next: disp_A
+      - component.update: disp_A

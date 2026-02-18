@@ -1,12 +1,34 @@
+# ESPHome configuration for M5C-0004
+# Copyright © Stephen Irons 2026
+
+# Hardware
+# * M5Stick-C
+
+
+substitutions:
+  device_id: m5c-0004
+  device_name: M5C-0004
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0004-00
+  device_model: M5Stick-C
+  device_serial: 99-9001-0004
+  device_uart: "/dev/serial/by-id/usb-Kongou_Hikari_M5Stack_Intf_9156038945-if00-port0"
+  device_ipaddr: "192.168.1.124"
+  device_hostname: m5c-0004.local
+  device_uuid: 92bcad4d-d244-4a35-afb2-034afdc2f9a1
+
+  ha_api_key: !secret m5c-0004-ha_api_key
+  ota_password: !secret m5c-0004-ota_password
+  ap_ssid: !secret m5c-0004-ap_ssid
+  ap_psk: !secret m5c-0004-ap_psk
+
+
 esphome:
-  name: m5c-0004
+  name: ${device_id}
+  friendly_name: ${device_name}
   platformio_options:
     upload_speed: 750000
 
-external_components:
-  # AXP192 power management needed to turn TFT power on
-  - source: github://martydingo/esphome-axp192
-    components: [axp192]
 
 esp32:
   board: m5stick-c
@@ -14,83 +36,88 @@ esp32:
     # External component axp192 requires arduino framework
     type: arduino
 
-# Enable logging
-logger:
 
-# Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: ${ota_password}
+
+
+logger:
+
+
+packages:
+  core_hw: !include
+    file: m5stick-c.yaml
+
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
+  fonts: !include
+    file: fonts-m5stick.yaml
 
 
 wifi:
-  networks:
-    - ssid: !secret wifi1_ssid
-      password: !secret wifi1_psk
-    - ssid: !secret wifi2_ssid
-      password: !secret wifi2_psk
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
+
+
+binary_sensor:
+  - id: !extend btn_A
+    on_press:
+      then:
+        - light.toggle: light1
+
+  - id: !extend btn_B
+    on_press:
+      then:
+        - light.turn_on: light1
+    on_release:
+      then:
+        - light.turn_off: light1
 
 
 light:
   - platform: monochromatic
-    output: builtin_led
+    id: light1
     name: LED
-    id: led1
-
-output:
-  - platform: ledc
-    pin: GPIO10
-    inverted: true
-    id: builtin_led
+    output: led1
 
 
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO37
-      inverted: true
-    name: Button A
-    on_press:
-      then:
-        - light.toggle: led1
+sensor:
+  - platform: wifi_signal
+    name: WiFi Level
+    id: wifi_dBm
+    update_interval: 30s
 
-  - platform: gpio
-    pin:
-      number: GPIO39
-      inverted: true
-    name: Button B
-    on_press:
-      then:
-        - light.turn_on: led1
-    on_release:
-      then:
-        - light.turn_off: led1
 
-spi:
-  clk_pin: GPIO13
-  mosi_pin: GPIO15
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+
+    ssid:
+      name: "SSID"
+
+    mac_address:
+      name: "MAC"
+
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
 
 display:
-  - platform: st7735
-    model: "INITR_MINI160X80"
-    reset_pin: GPIO18
-    cs_pin: GPIO5
-    dc_pin: GPIO23
-    rotation: 270
-    device_width: 80
-    device_height: 160
-    col_start: 26
-    row_start: 1
-    use_bgr: true
-    invert_colors: true
-    eight_bit_color: true
-    update_interval: 10s
-
-    id: disp_1
+  - id: !extend disp_A
     pages:
       - id: page_diagnostics
         lambda: |-
@@ -118,44 +145,5 @@ display:
 interval:
   - interval: 5s
     then:
-      - display.page.show_next: disp_1
-      - component.update: disp_1
-
-
-font:
-  - file: "fonts/X11/75dpi/helvR10.bdf"
-    id: text_normal
-
-  - file: "fonts/X11/75dpi/helvB10.bdf"
-    id: text_bold
-
-  - file: "fonts/X11/75dpi/helvB12.bdf"
-    id: heading
-
-  - file: "fonts/X11/75dpi/helvR08.bdf"
-    id: text_tiny
-
-
-i2c:
-  - id: bus_a
-    sda: GPIO21
-    scl: GPIO22
-    scan: true
-
-sensor:
-  - platform: axp192
-    model: M5STICKC
-    address: 0x34
-    i2c_id: bus_a
-    update_interval: 30s
-    battery_level:
-      name: "Battery Level"
-      id: "battery_level_pc"
-
-  - platform: wifi_signal
-    name: WiFi Level
-    id: wifi_dBm
-
-  - platform: uptime
-    name: Uptime
-    id: uptime_s
+      - display.page.show_next: disp_A
+      - component.update: disp_A

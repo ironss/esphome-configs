@@ -1,52 +1,83 @@
+# ESPHome configuration for M5S-0002
+# Copyright © Stephen Irons 2026
+
+# Hardware
+# * M5Stack
+
+
+substitutions:
+  device_id: m5s-0002
+  device_name: M5S-0002
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0005-00
+  device_model: M5Stack-1
+  device_serial: 99-9001-0002
+  device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EF578F-if00-port0"
+  device_ipaddr: "192.168.1.122"
+  device_hostname: m5s-0002.local
+  device_uuid: 43938fa5-2ff3-490e-a329-9826b5338999
+
+  ha_api_key: !secret m5s-0002-ha_api_key
+  ota_password: !secret m5s-0002-ota_password
+  ap_ssid: !secret m5s-0002-ap_ssid
+  ap_psk: !secret m5s-0002-ap_psk
+  tb_api_key: !secret m5s-0002-tb_api_key
+
+
 esphome:
-  name: m5s-0002
+  name: ${device_id}
+  friendly_name: ${device_name}
+
   on_boot:
     then:
       - output.turn_on:
           id: lcd_bl
+
       - output.set_level:
           id: lcd_bl
           level: 100%
 
-packages:
-  core_hw: !include 
-    file: m5stack-core.yaml
-    vars:
-      invert_colors: true
-
-  fonts: !include
-    file: fonts-m5stack.yaml
-    
 
 esp32:
   board: m5stack-core-esp32
   framework:
     type: esp-idf
 
-# Enable logging
-logger:
 
-# Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: ${ota_password}
+
+
+logger:
+
+
+packages:
+  core_hw: !include
+    file: m5stack-core.yaml
+    vars:
+      invert_colors: true
+
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
+  fonts: !include
+    file: fonts-m5stack.yaml
+
 
 
 wifi:
-  networks:
-    - ssid: "ioSphere dev"
-      password: !secret "wifi_psk_ioSphere dev"
-#      manual_ip:
-#        static_ip: 192.168.1.161
-#        gateway: 192.168.1.1
-#        subnet: 255.255.255.0
-        
-    - ssid: "wodexitose"
-      password: !secret "wifi_psk_wodexitose"
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
 
   on_connect:
     then:
@@ -68,20 +99,28 @@ wifi:
       - lvgl.label.update:
           id: page_wifi_value_ipaddr
           text: " "
-      
+
+binary_sensor:
+  - id: !extend btn_C
+    on_press:
+      then:
+        - lvgl.page.next:
+
+
 sensor:
   - platform: wifi_signal
     name: "WiFi signal sensor"
     update_interval: 30s
     on_value:
-      then: 
+      then:
         - lvgl.label.update:
             id: page_wifi_value_rssi
             text:
               format: "%.1f"
               args:
                 - x
-      
+
+
 text_sensor:
   - platform: wifi_info
     ip_address:
@@ -94,6 +133,7 @@ text_sensor:
                 format: "%s"
                 args:
                   - x.c_str()
+
     ssid:
       name: "SSID"
       on_value:
@@ -103,17 +143,31 @@ text_sensor:
               text:
                 format: "%s"
                 args:
-                  - x.c_str()        
+                  - x.c_str()
+
     mac_address:
       name: "MAC"
-      
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_macaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+
 lvgl:
   displays:
-    - lcd_A
+    - disp_A
   pages:
     - !include
         file: page_wifi.yaml
         vars:
           page_id: page_wifi
           page_title: "Wi-Fi"
-

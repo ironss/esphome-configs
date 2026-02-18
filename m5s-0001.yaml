@@ -6,6 +6,7 @@
 #     * M5Stack
 #     * LoRa433 module, modified to bring OOK output to GPIO13
 
+
 substitutions:
   device_id: m5s-0001
   device_name: M5S-0001
@@ -22,30 +23,18 @@ substitutions:
   ota_password: !secret m5s-0001-ota_password
   ap_ssid: !secret m5s-0001-ap_ssid
   ap_psk: !secret m5s-0001-ap_psk
-  http_api_key1: !secret m5s-0001-tb_api_key
+  tb_api_key: !secret m5s-0001-tb_api_key
 
 
 esphome:
   name: ${device_id}
   friendly_name: ${device_name}
-  includes:
-    - vc_version.h
-    - build_details.h
-
   platformio_options:
     build_flags:
       - -DMY_RTL433_DEVICES=DECL\\(fineoffset_wh1080\\)
 
   on_boot:
     then:
-      - lambda: |-
-          id(g_bootcount) += 1;
-          id(bootcount).publish_state(id(g_bootcount));
-
-      - lambda: |-
-          id(firmware_version).publish_state(FW_VERSION);
-          id(build_ulid).publish_state(BUILD_ULID);
-
       - output.turn_on:
           id: lcd_bl
 
@@ -58,8 +47,6 @@ esp32:
   board: m5stack-core-esp32
   framework:
     type: esp-idf
-#    sdkconfig_options:
-#      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: y
 
 
 api:
@@ -76,20 +63,15 @@ logger:
 
 
 globals:
-  - id: g_bootcount
-    type: int
-    initial_value: '0'
-    restore_value: yes
-
-  - id: g_attributes_sent
-    type: bool
-    initial_value: 'false'
-
   - id: g_wx_telemetry_dirty
     type: bool
     initial_value: 'false'
 
   - id: g_wx_telemetry_blocked
+    type: bool
+    initial_value: 'false'
+
+  - id: g_attributes_sent
     type: bool
     initial_value: 'false'
 
@@ -125,23 +107,17 @@ packages:
       wx_tx_model: "Fineoffset-WHx080"
       wx_tx_id: 87
 
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
   fonts: !include
     file: fonts-m5stack.yaml
 
 
 wifi:
-  id: wifi1
-  fast_connect: true
-  enable_btm: true
-  enable_rrm: true
-
-  networks:
-    - ssid: !secret wifi-1-ssid
-      password: !secret wifi-1-psk
-
-    - ssid: !secret wifi-2-ssid
-      password: !secret wifi-2-ssid
-
   ap:
     ssid: ${ap_ssid}
     password: ${ap_psk}
@@ -168,62 +144,27 @@ wifi:
           text: " "
 
 
-debug:
-  update_interval: 10s
-
-
-time:
-  - platform: homeassistant
-    id: ha_time
-
-
-text_sensor:
-  - platform: template
-    id: firmware_version
-    name: "Firmware version"
-    entity_category: diagnostic
-
-  - platform: template
-    id: build_ulid
-    name: "Build ULID"
-    entity_category: diagnostic
-
-  - platform: wifi_info
-    ip_address:
-      name: "IP address"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_ipaddr
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
-
-    ssid:
-      name: "SSID"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_ssid
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
-
-    mac_address:
-      name: "MAC"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_macaddr
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
+binary_sensor:
+  - id: !extend btn_C
+    on_press:
+      then:
+        - lvgl.page.next:
 
 
 sensor:
+  - platform: wifi_signal
+    name: "WiFi signal sensor"
+    update_interval: 10s
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_wifi_value_rssi
+            text:
+              format: "%.1f"
+              args:
+                - x
+
+
   - id: !extend lps22_A
     pressure:
       on_value:
@@ -376,54 +317,50 @@ sensor:
                 - x
 
 
-  # Wi-Fi
-  - platform: wifi_signal
-    name: "WiFi signal sensor"
-    update_interval: 10s
-    on_value:
-      then:
-        - lvgl.label.update:
-            id: page_wifi_value_rssi
-            text:
-              format: "%.1f"
-              args:
-                - x
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ipaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
 
-  - platform: uptime
-    id: uptime_s
-    type: seconds
-    name: Uptime Sensor
+    ssid:
+      name: "SSID"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ssid
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
 
-  - platform: debug
-    free:
-      name: "Heap free"
-    fragmentation:
-      name: "Heap fragmentation"
-    block:
-      name: "Heap max block"
-    loop_time:
-      name: "Loop time"
-
-  - platform: template
-    id: bootcount
-    name: "Bootcount"
-    entity_category: diagnostic
-    lambda: |-
-      return id(g_bootcount);
-    accuracy_decimals: 0
-    update_interval: never
+    mac_address:
+      name: "MAC"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_macaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
 
 
-binary_sensor:
-  - id: !extend btn_C
-    on_press:
-      then:
-        - lvgl.page.next:
+time:
+  - platform: homeassistant
+    id: ha_time
 
 
 lvgl:
   displays:
-    - lcd_A
+    - disp_A
   buffer_size: 8%
   pages:
     - !include
@@ -491,7 +428,7 @@ script:
   - id: wx_telemetry_send_now
     then:
       - http_request.post:
-          url: "https://iot.irons.nz/api/v1/${http_api_key1}/telemetry"
+          url: "https://iot.irons.nz/api/v1/${tb_api_key}/telemetry"
           request_headers:
             Content-Type: application/json
           json: !lambda |-
@@ -525,7 +462,7 @@ script:
   - id: wx_attributes_send_now
     then:
       - http_request.post:
-          url: "https://iot.irons.nz/api/v1/${http_api_key1}/attributes"
+          url: "https://iot.irons.nz/api/v1/${tb_api_key}/attributes"
           request_headers:
             Content-Type: application/json
           json: !lambda |-

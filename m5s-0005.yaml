@@ -1,8 +1,10 @@
-# ESPHome configuration for M5S-0001
+# ESPHome configuration for M5S-0005
 # Copyright © Stephen Irons 2026
 
 # Hardware
-# * M5RELAY
+# * M5Stack
+# * Relay base
+
 
 substitutions:
   device_id: m5s-0005
@@ -20,7 +22,7 @@ substitutions:
   ota_password: !secret m5s-0005-ota_password
   ap_ssid: !secret m5s-0005-ap_ssid
   ap_psk: !secret m5s-0005-ap_psk
-  http_api_key1: !secret m5s-0005-tb_api_key
+  tb_api_key: !secret m5s-0005-tb_api_key
 
 
 esphome:
@@ -101,59 +103,6 @@ wifi:
           text: " "
 
 
-time:
-  - platform: homeassistant
-    id: ha_time
-
-
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "IP address"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_ipaddr
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
-    ssid:
-      name: "SSID"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_ssid
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
-    mac_address:
-      name: "MAC"
-      on_value:
-        then:
-          - lvgl.label.update:
-              id: page_wifi_value_macaddr
-              text:
-                format: "%s"
-                args:
-                  - x.c_str()
-
-
-sensor:
-  - platform: wifi_signal
-    name: "WiFi signal sensor"
-    update_interval: 30s
-    on_value:
-      then:
-        - lvgl.label.update:
-            id: page_wifi_value_rssi
-            text:
-              format: "%.1f"
-              args:
-                - x
-
-
 binary_sensor:
   - id: !extend btn_A
     on_press:
@@ -177,9 +126,64 @@ binary_sensor:
         - lvgl.page.next:
 
 
+sensor:
+  - platform: wifi_signal
+    name: "WiFi signal sensor"
+    update_interval: 30s
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_wifi_value_rssi
+            text:
+              format: "%.1f"
+              args:
+                - x
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ipaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+
+    ssid:
+      name: "SSID"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_ssid
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+
+    mac_address:
+      name: "MAC"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_macaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+
 lvgl:
   displays:
-    - lcd_A
+    - disp_A
   buffer_size: 8%
   pages:
     - !include

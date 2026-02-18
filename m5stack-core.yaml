@@ -35,7 +35,7 @@ spi:
     mosi_pin: GPIO23
     miso_pin: GPIO19
     id: spi_A
-    
+
 i2c:
   - sda: GPIO21
     scl: GPIO22
@@ -44,8 +44,8 @@ i2c:
 
 display:
   - platform: mipi_spi
+    id: disp_A
     model: ILI9341
-    id: lcd_A
     reset_pin: GPIO33
     cs_pin: GPIO14
     dc_pin: GPIO27
@@ -61,5 +61,3 @@ display:
       mirror_y: false
     auto_clear_enabled: false
     update_interval: never
-    
-
