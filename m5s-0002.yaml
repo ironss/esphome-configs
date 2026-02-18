@@ -59,7 +59,7 @@ logger:
 
 packages:
   core_hw: !include
-    file: m5stack-core.yaml
+    file: hw/m5stack-core.yaml
     vars:
       invert_colors: true
 

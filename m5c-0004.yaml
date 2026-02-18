@@ -52,7 +52,7 @@ logger:
 
 packages:
   core_hw: !include
-    file: m5stick-c.yaml
+    file: hw/m5stick-c.yaml
 
   common: !include
     file: shared/debug.yaml

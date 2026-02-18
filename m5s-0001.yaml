@@ -78,12 +78,12 @@ globals:
 
 packages:
   core_hw: !include
-    file: m5stack-core.yaml
+    file: hw/m5stack-core.yaml
     vars:
       invert_colors: true
 
   lps_hw: !include
-    file: lps22.yaml
+    file: hw/lps22.yaml
     vars:
       lps22_id: lps22_A
       lps22_name: LPS22.A
@@ -91,7 +91,7 @@ packages:
       lps22_i2c_addr: 0x5D
 
   rx_hw: !include
-    file: m5stack-lora433-ook.yaml
+    file: hw/m5stack-lora433-ook.yaml
     vars:
       rx_id: rx_A
       rx_name: RX.A
@@ -99,7 +99,7 @@ packages:
       rx_frequency: 433920000
 
   wx: !include
-    file: wx-433.yaml
+    file: hw/wx-433.yaml
     vars:
       wx_id: wx_A
       wx_name: WX.A
