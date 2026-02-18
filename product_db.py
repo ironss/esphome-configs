@@ -51,7 +51,7 @@ class ProductDB:
         self.conn = sqlite3.connect(db_path, isolation_level=None)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
-        self.conn.execute("PRAGMA journal_mode = WAL")
+        self.conn.execute("PRAGMA journal_mode = WAL")  # WAL mode enabled
         self._create_schema()
 
     def _create_schema(self):
@@ -77,7 +77,6 @@ class ProductDB:
         CREATE TABLE IF NOT EXISTS device (
             ulid TEXT PRIMARY KEY,
             device_type TEXT NOT NULL,
-            part_number TEXT NOT NULL,
             serial_number TEXT NOT NULL UNIQUE,
             FOREIGN KEY(device_type) REFERENCES device_type(ulid)
         );
@@ -193,14 +192,14 @@ class ProductDB:
     # Device
     ###########################################################################
 
-    def add_device(self, device_type_ulid, part_number, serial_number) -> str:
+    def add_device(self, device_type_ulid, serial_number) -> str:
         ulid = new_ulid()
         self.conn.execute("""
             INSERT INTO device
-            (ulid, device_type, part_number, serial_number)
-            VALUES (?, ?, ?, ?)
-        """, (ulid, device_type_ulid, part_number, serial_number))
-        self._history(ulid, "CREATE_DEVICE", f"{part_number}/{serial_number}")
+            (ulid, device_type, serial_number)
+            VALUES (?, ?, ?)
+        """, (ulid, device_type_ulid, serial_number))
+        self._history(ulid, "CREATE_DEVICE", f"{serial_number}")
         return ulid
 
     def add_device_attribute(self, device_ulid: str, attribute_name: str,
@@ -233,7 +232,7 @@ class ProductDB:
                      model: Optional[str] = None) -> List[Dict[str, Any]]:
 
         query = """
-        SELECT d.*, dt.model AS model, dt.manufacturer_name
+        SELECT d.*, dt.model AS model, dt.manufacturer_name, dt.part_number
         FROM device d
         JOIN device_type dt ON d.device_type = dt.ulid
         WHERE 1=1
@@ -244,7 +243,7 @@ class ProductDB:
             query += " AND dt.manufacturer_name LIKE ?"
             params.append(f"%{manufacturer}%")
         if part_number:
-            query += " AND d.part_number LIKE ?"
+            query += " AND dt.part_number LIKE ?"
             params.append(f"%{part_number}%")
         if serial_number:
             query += " AND d.serial_number LIKE ?"
@@ -369,7 +368,7 @@ def main():
                         (serial,)
                     ).fetchone():
                         raise SystemExit(json.dumps({"error": "Serial exists"}))
-                device_ulid = db.add_device(dt["ulid"], dt["part_number"], serial)
+                device_ulid = db.add_device(dt["ulid"], serial)
 
                 # Add attributes if provided
                 if args.attribute:
