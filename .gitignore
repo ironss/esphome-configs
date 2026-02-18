@@ -6,6 +6,7 @@
 /secrets.yaml
 
 /esphome.kdbx
+/product.db
 
 vc_version.h
 build_details.h
