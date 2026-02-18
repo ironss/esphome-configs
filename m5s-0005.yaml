@@ -1,52 +1,111 @@
+# ESPHome configuration for M5S-0001
+# Copyright © Stephen Irons 2026
+
+# Hardware
+# * M5RELAY
+
+substitutions:
+  device_id: m5s-0005
+  device_name: M5S-0005
+  device_manufacturer: Ironspark
+  device_part_number: 99-9001-0012-00
+  device_model: M5RELAY-1
+  device_serial: 99-9001-0005
+  device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01BB98C0-if00-port0"
+  device_ipaddr: "192.168.1.125"
+  device_hostname: m5s-0005.local
+  device_uuid: db3fc64b-6dab-4623-a621-32026a754518
+
+  ha_api_key: !secret m5s-0005-ha_api_key
+  ota_password: !secret m5s-0005-ota_password
+  ap_ssid: !secret m5s-0005-ap_ssid
+  ap_psk: !secret m5s-0005-ap_psk
+  http_api_key1: !secret m5s-0005-tb_api_key
+
+
 esphome:
-  name: m5s-0005
+  name: ${device_id}
+  friendly_name: ${device_name}
+  includes:
+    - vc_version.h
+    - build_details.h
+
   on_boot:
     then:
+      - lambda: |-
+          id(g_bootcount) += 1;
+          id(bootcount).publish_state(id(g_bootcount));
+
+      - lambda: |-
+          id(firmware_version).publish_state(FW_VERSION);
+          id(build_ulid).publish_state(BUILD_ULID);
+
       - output.turn_on:
           id: lcd_bl
+
       - output.set_level:
           id: lcd_bl
           level: 100%
 
-packages:
-  core_hw: !include 
-    file: m5stack-core.yaml
-    vars:
-      invert_colors: false
-
-  fonts: !include
-    file: fonts-m5stack.yaml
-    
 
 esp32:
   board: m5stack-core-esp32
   framework:
     type: esp-idf
 
-# Enable logging
-logger:
 
-# Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
+    password: ${ota_password}
+
+
+logger:
+
+
+globals:
+  - id: g_bootcount
+    type: int
+    initial_value: '0'
+    restore_value: yes
+
+
+packages:
+  core_hw: !include
+    file: m5stack-core.yaml
+    vars:
+      invert_colors: false
+
+  base: !include
+    file: m5stack-relay.yaml
+
+  fonts: !include
+    file: fonts-m5stack.yaml
+
+  wifi: !include
+    file: wifi-common.yaml
 
 
 wifi:
+  id: wifi1
+  fast_connect: true
+  enable_btm: true
+  enable_rrm: true
+
   networks:
-    - ssid: "ioSphere dev"
-      password: !secret "wifi_psk_ioSphere dev"
-#      manual_ip:
-#        static_ip: 192.168.1.161
-#        gateway: 192.168.1.1
-#        subnet: 255.255.255.0
-        
-    - ssid: "wodexitose"
-      password: !secret "wifi_psk_wodexitose"
+    - ssid: !secret wifi-1-ssid
+      password: !secret wifi-1-psk
+
+    - ssid: !secret wifi-2-ssid
+      password: !secret wifi-2-ssid
+
+  ap:
+    ssid: ${ap_ssid}
+    password: ${ap_psk}
 
   on_connect:
     then:
@@ -68,21 +127,28 @@ wifi:
       - lvgl.label.update:
           id: page_wifi_value_ipaddr
           text: " "
-      
-sensor:
-  - platform: wifi_signal
-    name: "WiFi signal sensor"
-    update_interval: 30s
-    on_value:
-      then: 
-        - lvgl.label.update:
-            id: page_wifi_value_rssi
-            text:
-              format: "%.1f"
-              args:
-                - x
-      
+
+
+debug:
+  update_interval: 10s
+
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+
 text_sensor:
+  - platform: template
+    id: firmware_version
+    name: "Firmware version"
+    entity_category: diagnostic
+
+  - platform: template
+    id: build_ulid
+    name: "Build ULID"
+    entity_category: diagnostic
+
   - platform: wifi_info
     ip_address:
       name: "IP address"
@@ -103,17 +169,87 @@ text_sensor:
               text:
                 format: "%s"
                 args:
-                  - x.c_str()        
+                  - x.c_str()
     mac_address:
       name: "MAC"
-      
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_wifi_value_macaddr
+              text:
+                format: "%s"
+                args:
+                  - x.c_str()
+
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi signal sensor"
+    update_interval: 30s
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_wifi_value_rssi
+            text:
+              format: "%.1f"
+              args:
+                - x
+
+  - platform: uptime
+    id: uptime_s
+    type: seconds
+    name: Uptime Sensor
+
+  - platform: debug
+    free:
+      name: "Heap free"
+    fragmentation:
+      name: "Heap fragmentation"
+    block:
+      name: "Heap max block"
+    loop_time:
+      name: "Loop time"
+
+  - platform: template
+    id: bootcount
+    name: "Bootcount"
+    entity_category: diagnostic
+    lambda: |-
+      return id(g_bootcount);
+    accuracy_decimals: 0
+    update_interval: never
+
+
+binary_sensor:
+  - id: !extend btn_A
+    on_press:
+      then:
+        - output.turn_on: rly_A
+    on_release:
+      then:
+        - output.turn_off: rly_A
+
+  - id: !extend btn_B
+    on_press:
+      then:
+        - output.turn_on: rly_B
+    on_release:
+      then:
+        - output.turn_off: rly_B
+
+  - id: !extend btn_C
+    on_press:
+      then:
+        - lvgl.page.next:
+
+
 lvgl:
   displays:
     - lcd_A
+  buffer_size: 8%
   pages:
     - !include
         file: page_wifi.yaml
         vars:
           page_id: page_wifi
           page_title: "Wi-Fi"
-

@@ -1,0 +1,12 @@
+# Configuration for M5Stack Relay
+
+output:
+  - platform: gpio
+    id: rly_A
+    pin: GPIO15
+    inverted: false
+
+  - platform: gpio
+    id: rly_B
+    pin: GPIO12
+    inverted: false

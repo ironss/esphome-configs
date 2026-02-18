@@ -146,7 +146,6 @@ wifi:
     ssid: ${ap_ssid}
     password: ${ap_psk}
 
-
   on_connect:
     then:
       - lvgl.label.update:
@@ -176,11 +175,6 @@ debug:
 time:
   - platform: homeassistant
     id: ha_time
-
-
-http_request:
-  timeout: 10s
-  watchdog_timeout: 20s
 
 
 text_sensor:
@@ -445,12 +439,16 @@ lvgl:
           page_title: "Wi-Fi"
 
 
+http_request:
+  timeout: 10s
+  watchdog_timeout: 20s
+
+
 script:
   - id: wx_telemetry_trigger
     then:
       - lambda: id(g_wx_telemetry_dirty) = true;
       - script.execute: wx_telemetry_send_throttled
-
 
   - id: wx_telemetry_send_throttled
     then:
