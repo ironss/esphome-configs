@@ -1,6 +1,6 @@
 id: ${page_id}
 lambda: |-
-  it.printf(120, 20, id(heading), TextAlign::BASELINE_CENTER, "${page_title}");
+  it.printf(2, 20, id(heading), TextAlign::BASELINE_LEFT, "${page_title}");
 
   it.printf(2, 31, id(text_normal), TextAlign::BASELINE_LEFT, "TBD");
   it.printf(120, 31, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
