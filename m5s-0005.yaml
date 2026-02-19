@@ -64,7 +64,7 @@ packages:
       invert_colors: false
 
   m5base: !include
-    file: m5stack-relay.yaml
+    file: hw/m5stack-relay.yaml
 
   common: !include
     file: shared/debug.yaml
