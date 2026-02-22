@@ -1,0 +1,34 @@
+
+
+host:
+
+
+binary_sensor:
+  - platform: sdl
+    id: btn_A
+    key: SDLK_1
+
+  - platform: sdl
+    id: btn_B
+    key: SDLK_2
+
+  - platform: sdl
+    id: btn_C
+    key: SDLK_3
+
+
+sensor:
+  - platform: template
+    id: battery_level_pc
+    name: Battery level
+
+
+display:
+  - platform: sdl
+    id: disp_A
+    # show_test_card: true
+    dimensions:
+      width: ${display_width}
+      height: ${display_height}
+    window_options:
+      resizable: true

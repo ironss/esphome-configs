@@ -81,6 +81,8 @@ binary_sensor:
     on_press:
       then:
         - light.turn_on: light1
+        - display.page.show_next: disp_A
+
     on_release:
       then:
         - light.turn_off: light1
@@ -135,9 +137,16 @@ display:
             page_id: page_wifi
             page_title: "Wi-Fi"
 
+      - !include
+          file: page-test-simple.yaml
+          vars:
+            page_id: page_test
+            page_title: "Text test page"
+            test_text: "AGKMQRWXadibegjmqptwy"
+
 
 interval:
-  - interval: 5s
+  - interval: 10s
     then:
       - display.page.show_next: disp_A
       - component.update: disp_A
