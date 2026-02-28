@@ -76,7 +76,7 @@ packages:
     file: hw/m5stack-relay.yaml
 
   fonts: !include
-    file: fonts-m5stack.yaml
+    file: fonts/fonts-m5stack.yaml
 
 
 wifi:

@@ -65,7 +65,7 @@ packages:
     file: shared/wifi.yaml
 
   fonts: !include
-    file: fonts-m5stick.yaml
+    file: fonts/fonts-m5stick.yaml
 
 
 wifi:

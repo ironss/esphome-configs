@@ -51,7 +51,7 @@ packages:
     file: shared/debug-heap.yaml
 
   fonts: !include
-    file: fonts-m5stick.yaml
+    file: fonts/fonts-m5stick.yaml
 
 
 binary_sensor:

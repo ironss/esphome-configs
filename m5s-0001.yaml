@@ -117,7 +117,7 @@ packages:
       wx_tx_id: 87
 
   fonts: !include
-    file: fonts-m5stack.yaml
+    file: fonts/fonts-m5stack.yaml
 
 
 wifi:

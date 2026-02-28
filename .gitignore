@@ -11,4 +11,5 @@
 vc_version.h
 build_details.h
 
-/fonts/
+/fonts/ttf/
+/fonts/X11/
