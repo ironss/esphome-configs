@@ -1,0 +1,18 @@
+# ESPHome configuration: shared debug
+# Copyright © Stephen Irons 2026
+
+
+debug:
+  update_interval: 10s
+
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap free"
+    fragmentation:
+      name: "Heap fragmentation"
+    block:
+      name: "Heap max block"
+    loop_time:
+      name: "Loop time"

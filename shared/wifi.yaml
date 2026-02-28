@@ -4,6 +4,11 @@
 wifi:
   id: wifi1
   fast_connect: true
+
+  # BTM and RRM are not supported on BK72xx
+  # They are optional, and not really needed as the devices are stationary and have good signal strength.
+  # TODO: enable on ESP32, not on BK72xx
+
   # enable_btm: true
   # enable_rrm: true
 
@@ -12,4 +17,4 @@ wifi:
       password: !secret wifi-1-psk
 
     - ssid: !secret wifi-2-ssid
-      password: !secret wifi-2-ssid
+      password: !secret wifi-2-psk

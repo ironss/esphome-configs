@@ -63,14 +63,17 @@ packages:
     vars:
       invert_colors: false
 
-  m5base: !include
-    file: hw/m5stack-relay.yaml
+  firmware_details: !include
+    file: shared/firmware_details.yaml
 
   common: !include
-    file: shared/debug.yaml
+    file: shared/debug-heap.yaml
 
   wifi: !include
     file: shared/wifi.yaml
+
+  m5base: !include
+    file: hw/m5stack-relay.yaml
 
   fonts: !include
     file: fonts-m5stack.yaml

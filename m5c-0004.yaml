@@ -21,6 +21,7 @@ substitutions:
   ota_password: !secret m5c-0004-ota_password
   ap_ssid: !secret m5c-0004-ap_ssid
   ap_psk: !secret m5c-0004-ap_psk
+  tb_api_key: !secret m5c-0004-tb_api_key
 
 
 esphome:
@@ -54,8 +55,11 @@ packages:
   core_hw: !include
     file: hw/m5stick-c.yaml
 
+  firmware_details: !include
+    file: shared/firmware_details.yaml
+
   common: !include
-    file: shared/debug.yaml
+    file: shared/debug-heap.yaml
 
   wifi: !include
     file: shared/wifi.yaml
@@ -80,6 +84,8 @@ binary_sensor:
     on_press:
       then:
         - light.turn_on: light1
+        - display.page.show_next: disp_A
+
     on_release:
       then:
         - light.turn_off: light1
@@ -134,9 +140,16 @@ display:
             page_id: page_wifi
             page_title: "Wi-Fi"
 
+      - !include
+          file: page-test-simple.yaml
+          vars:
+            page_id: page_test
+            page_title: "Text test page"
+            test_text: "AGKMQRWXadibegjmqptwy"
+
 
 interval:
-  - interval: 5s
+  - interval: 10s
     then:
       - display.page.show_next: disp_A
       - component.update: disp_A

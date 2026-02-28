@@ -82,6 +82,15 @@ packages:
     vars:
       invert_colors: true
 
+  firmware_details: !include
+    file: shared/firmware_details.yaml
+
+  common: !include
+    file: shared/debug-heap.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
   lps_hw: !include
     file: hw/lps22.yaml
     vars:
@@ -106,12 +115,6 @@ packages:
       rx_id: rx_A
       wx_tx_model: "Fineoffset-WHx080"
       wx_tx_id: 87
-
-  common: !include
-    file: shared/debug.yaml
-
-  wifi: !include
-    file: shared/wifi.yaml
 
   fonts: !include
     file: fonts-m5stack.yaml

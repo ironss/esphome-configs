@@ -57,8 +57,11 @@ packages:
   core_hw: !include
     file: hw/m5dial.yaml
 
+  firmware_details: !include
+    file: shared/firmware_details.yaml
+
   common: !include
-    file: shared/debug.yaml
+    file: shared/debug-heap.yaml
 
   wifi: !include
     file: shared/wifi.yaml

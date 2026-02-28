@@ -44,8 +44,11 @@ packages:
       display_width: 160
       display_height: 80
 
+  firmware_details: !include
+    file: shared/firmware_details.yaml
+
   common: !include
-    file: shared/debug.yaml
+    file: shared/debug-heap.yaml
 
   fonts: !include
     file: fonts-m5stick.yaml

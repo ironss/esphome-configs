@@ -50,8 +50,16 @@ logger:
 
 
 packages:
-  common: !include
-    file: shared/debug.yaml
+  # TODO: include hardware details
+  # core_hw: !include
+  #   file: hw/pc191-ha-series-3.yaml
+
+  firmware_details: !include
+    file: shared/firmware_details.yaml
+
+  # debug-heap is not available on BK72xx
+  # debug_heap: !include
+  #   file: shared/debug-heap.yaml
 
   wifi: !include
     file: shared/wifi.yaml
