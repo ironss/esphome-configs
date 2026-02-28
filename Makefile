@@ -105,5 +105,5 @@ run-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
 .PHONY: run-ota
 
 logs-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) logs $< --device ota://$(DEVICE_IPADDR)
+	$(ESPHOME_BIN) logs $< --device $(DEVICE_IPADDR)
 .PHONY: logs-ota
