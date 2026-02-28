@@ -154,13 +154,13 @@ display:
   - id: !extend disp_A
     pages:
       - !include
-          file: page-diag-simple.yaml
+          file: pages-simple/page-diag.yaml
           vars:
             page_id: page_diag
             page_title: "Diagnostics"
 
       - !include
-          file: page-scan-simple.yaml
+          file: pages-simple/page-scan.yaml
           vars:
             page_id: page_scan
             page_title: "Scan"

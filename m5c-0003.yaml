@@ -129,19 +129,19 @@ display:
   - id: !extend disp_A
     pages:
       - !include
-          file: page-diag-simple.yaml
+          file: pages-simple/page-diag.yaml
           vars:
             page_id: page_diag
             page_title: "Diagnostics"
 
       - !include
-          file: page-wifi-simple.yaml
+          file: pages-simple/page-wifi.yaml
           vars:
             page_id: page_wifi
             page_title: "Wi-Fi"
 
       - !include
-          file: page-test-simple.yaml
+          file: pages-simple/page-test.yaml
           vars:
             page_id: page_test
             page_title: "Text test page"

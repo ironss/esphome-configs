@@ -170,7 +170,7 @@ lvgl:
     - disp_A
   pages:
     - !include
-        file: page_wifi.yaml
+        file: pages-lvgl/page-wifi.yaml
         vars:
           page_id: page_wifi
           page_title: "Wi-Fi"
