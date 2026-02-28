@@ -35,15 +35,15 @@ sensor:
     type: seconds
     name: Uptime Sensor
 
-  - platform: debug
-    free:
-      name: "Heap free"
-    fragmentation:
-      name: "Heap fragmentation"
-    block:
-      name: "Heap max block"
-    loop_time:
-      name: "Loop time"
+  # - platform: debug
+  #   free:
+  #     name: "Heap free"
+  #   fragmentation:
+  #     name: "Heap fragmentation"
+  #   block:
+  #     name: "Heap max block"
+  #   loop_time:
+  #     name: "Loop time"
 
   - platform: template
     id: bootcount

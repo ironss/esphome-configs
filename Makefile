@@ -7,8 +7,14 @@
 # * device public details
 # * device secrets
 
+ifeq ($(DEVICE_ID),)
+$(error DEVICE_ID is not set. Please set DEVICE_ID to the name of the device you want to build for)
+endif
+
+
 DEVICE_ID := $(subst .yaml,,$(DEVICE_ID))
 DEVICE_UART := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_uart"]')
+DEVICE_IPADDR := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_ipaddr"]')
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
@@ -91,5 +97,13 @@ run: $(DEVICE_ID).yaml vc-version secrets.yaml
 .PHONY: run
 
 logs: $(DEVICE_ID).yaml vc-version secrets.yaml
-	$(ESPHOME_BIN) logs $< -- device $(DEVICE_UART)
+	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
 .PHONY: logs
+
+run-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
+	$(ESPHOME_BIN) run $< --device $(DEVICE_IPADDR)
+.PHONY: run-ota
+
+logs-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
+	$(ESPHOME_BIN) logs $< --device ota://$(DEVICE_IPADDR)
+.PHONY: logs-ota

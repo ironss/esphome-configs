@@ -4,8 +4,8 @@
 wifi:
   id: wifi1
   fast_connect: true
-  enable_btm: true
-  enable_rrm: true
+  # enable_btm: true
+  # enable_rrm: true
 
   networks:
     - ssid: !secret wifi-1-ssid

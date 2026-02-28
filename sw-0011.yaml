@@ -1,37 +1,61 @@
+# ESPHome configuration for M5S-0001
+# Copyright © Stephen Irons 2026
+
+# Hardware
+# * Arlec Grid Connect Smart Plug
+# * BK72xx CB2S
+
+
+substitutions:
+  device_id: sw-0011
+  device_name: SW-0011
+  device_manufacturer: Ironspark
+  device_part_number: 99-9002-0011-00
+  device_model: PC191 HA Series 3
+  device_serial: 99-9005-0001
+  device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0"
+  device_ipaddr: "192.168.1.131"
+  device_hostname: sw-0011
+  device_uuid: 24caf015-0d63-462f-ad58-14e8d1951353
+
+  ha_api_key: !secret sw-0011-ha_api_key
+  ota_password: !secret sw-0011-ota_password
+  ap_ssid: !secret sw-0011-ap_ssid
+  ap_psk: !secret sw-0011-ap_psk
+  tb_api_key: !secret sw-0011-tb_api_key
+
+  bl0937_voltage_divider: "750"
+  bl0937_current_resistor: "0.0025 ohm"
+
+
 esphome:
-  name: sw-0011
+  name: ${device_id}
+  friendly_name: ${device_name}
 
 bk72xx:
   board: cb2s
 
-# Enable logging
-logger:
 
-# Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_key
+    key: ${ha_api_key}
+
 
 ota:
   - platform: esphome
-    password: !secret ota_password
-
-wifi:
-  networks:
-    - ssid: "ioSphere dev"
-      password: !secret "wifi_psk_ioSphere dev"
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "sw-0002 AP"
-    password: "7Ub86vv0vDOV"
-
-captive_portal:
+    password: ${ota_password}
 
 
-substitutions:
-  bl0937_voltage_divider: "750"
-  bl0937_current_resistor: "0.0025 ohm"
+logger:
+
+
+packages:
+  common: !include
+    file: shared/debug.yaml
+
+  wifi: !include
+    file: shared/wifi.yaml
+
 
 # The main relay is connected to P26
 switch:
@@ -45,6 +69,7 @@ switch:
     on_turn_off:
       then:
         light.turn_off: led1
+
 
 # The button on the side of the socket is wired to P11
 binary_sensor:
@@ -61,6 +86,7 @@ binary_sensor:
       then:
         switch.toggle: socket1
 
+
 # The LED is directly controlled via the state of the relay with the switch above
 light:
   - platform: binary
@@ -75,11 +101,9 @@ output:
     inverted: false  # was 'true' on Series 2
     pin: P26   # was P8 on Series 2
 
+
 # The pins were checked with a multimeter and the datasheet for the built in BL0937.
 sensor:
-  - platform: uptime
-    name: Uptime
-
   - platform: internal_temperature
     name: "Internal Temperature"
 
@@ -106,4 +130,3 @@ sensor:
     current_resistor: $bl0937_current_resistor
     update_interval: 15s
     change_mode_every: 4
-
