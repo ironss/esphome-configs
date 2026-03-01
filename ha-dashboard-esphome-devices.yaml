@@ -1,0 +1,61 @@
+title: ESPHome Devices
+icon: mdi:chip
+views:
+  - title: ESPHome Network
+    path: esphome-network
+    panel: true
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            title: Device Summary Table
+            content: |
+              | Device | ID | IP Address | Firmware | Uptime | Boots |
+              |--------|-----|-----------|-------------|--------|-------|
+              {%- set esphome_entities = integration_entities('esphome') %}
+              {%- for entity_id in esphome_entities | sort %}
+                {%- if entity_id.startswith('sensor.') and entity_id.endswith('_bootcount') %}
+                  {%- set device_name = entity_id.replace('sensor.', '').replace('_bootcount', '') %}
+                  {%- set id_sensor = 'text_sensor.' + device_name + '_device_id_sensor' %}
+                  {%- set name_sensor = 'text_sensor.' + device_name + '_device_name_sensor' %}
+                  {%- set ip_sensor = 'sensor.' + device_name + '_ip_address' %}
+                  {%- set fw_sensor = 'sensor.' + device_name + '_firmware_version' %}
+                  {%- set uptime_sensor = 'sensor.' + device_name + '_uptime_sensor' %}
+                  {%- set bootcount_sensor = 'sensor.' + device_name + '_bootcount' %}
+              | {{ states(name_sensor) if states(name_sensor) not in ['unknown', 'unavailable'] else device_name.replace('_', '-').upper() }} | {{ states(id_sensor) if states(id_sensor) not in ['unknown', 'unavailable'] else device_name }} | {{ states(ip_sensor) if states(ip_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(fw_sensor) if states(fw_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ ((states(uptime_sensor) | float / 3600) | round(1) | string + 'h') if states(uptime_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ (states(bootcount_sensor) | int) if states(bootcount_sensor) not in ['unknown', 'unavailable'] else '—' }} |
+                {%- endif %}
+              {%- endfor %}
+
+          - type: markdown
+            title: All Devices (Detailed List)
+            content: |
+              {% set esphome_entities = integration_entities('esphome') %}
+              {% for entity_id in esphome_entities | sort %}
+                {% if entity_id.startswith('sensor.') and entity_id.endswith('_bootcount') %}
+                  {% set device_name = entity_id.replace('sensor.', '').replace('_bootcount', '') %}
+                  {% set id_sensor = 'text_sensor.' + device_name + '_device_id_sensor' %}
+                  {% set name_sensor = 'text_sensor.' + device_name + '_device_name_sensor' %}
+                  {% set ip_sensor = 'sensor.' + device_name + '_ip_address' %}
+                  {% set fw_sensor = 'sensor.' + device_name + '_firmware_version' %}
+                  {% set esphome_ver_sensor = 'sensor.' + device_name + '_esphome_version' %}
+                  {% set uptime_sensor = 'sensor.' + device_name + '_uptime_sensor' %}
+                  {% set bootcount_sensor = 'sensor.' + device_name + '_bootcount' %}
+                  {% set mac_sensor = 'sensor.' + device_name + '_mac' %}
+                  {% set ssid_sensor = 'sensor.' + device_name + '_ssid' %}
+                  {% set wifi_level_sensor = 'sensor.' + device_name + '_wifi_level' %}
+
+              ### {{ states(name_sensor) if states(name_sensor) not in ['unknown', 'unavailable'] else device_name.replace('_', '-').upper() }}
+
+              - **Device ID:** {{ states(id_sensor) if states(id_sensor) not in ['unknown', 'unavailable'] else device_name }}
+              - **IP Address:** {{ states(ip_sensor) }}
+              - **MAC Address:** {{ states(mac_sensor) if states(mac_sensor) not in ['unknown', 'unavailable'] else 'N/A' }}
+              - **WiFi SSID:** {{ states(ssid_sensor) if states(ssid_sensor) not in ['unknown', 'unavailable'] else 'N/A' }}
+              - **WiFi Signal:** {{ states(wifi_level_sensor) if states(wifi_level_sensor) not in ['unknown', 'unavailable'] else 'N/A' }}%
+              - **Firmware Version:** {{ states(fw_sensor) }}
+              - **ESPHome Version:** {{ states(esphome_ver_sensor) if states(esphome_ver_sensor) not in ['unknown', 'unavailable'] else 'N/A' }}
+              - **Uptime:** {{ (states(uptime_sensor) | float / 3600) | round(1) if states(uptime_sensor) not in ['unknown', 'unavailable'] else 'N/A' }} hours
+              - **Boot Count:** {{ (states(bootcount_sensor) | int) if states(bootcount_sensor) not in ['unknown', 'unavailable'] else 'N/A' }}
+
+              ---
+                {% endif %}
+              {% endfor %}
