@@ -47,19 +47,35 @@ packages:
   firmware_details: !include
     file: shared/firmware_details.yaml
 
-  common: !include
-    file: shared/debug-heap.yaml
+  # common: !include
+  #   file: shared/debug-heap.yaml
 
   fonts: !include
     file: fonts/fonts-m5stick.yaml
 
 
+script:
+  - id: auto_advance_page
+    mode: restart
+    then:
+      - delay: 10s
+      - display.page.show_next: disp_A
+      - component.update: disp_A
+
+
 binary_sensor:
-  - id: !extend btn_A
+  - id: !extend btn_C
     on_press:
       then:
         - display.page.show_next: disp_A
         - component.update: disp_A
+        - script.execute: auto_advance_page
+
+
+sensor:
+  - platform: template
+    id: internal_temperature_C
+    name: "Internal Temperature"
 
 
 display:
@@ -86,7 +102,6 @@ display:
 
 
 interval:
-  - interval: 60s
+  - interval: 15s
     then:
-      - display.page.show_next: disp_A
-      - component.update: disp_A
+      - script.execute: auto_advance_page

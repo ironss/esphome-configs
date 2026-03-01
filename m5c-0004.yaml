@@ -74,6 +74,15 @@ wifi:
     password: ${ap_psk}
 
 
+script:
+  - id: auto_advance_page
+    mode: restart
+    then:
+      - delay: 10s
+      - display.page.show_next: disp_A
+      - component.update: disp_A
+
+
 binary_sensor:
   - id: !extend btn_A
     on_press:
@@ -86,6 +95,7 @@ binary_sensor:
         - light.turn_on: light1
         - display.page.show_next: disp_A
         - component.update: disp_A
+        - script.execute: auto_advance_page
 
     on_release:
       then:
@@ -134,10 +144,9 @@ display:
 
 
 interval:
-  - interval: 10s
+  - interval: 15s
     then:
-      - display.page.show_next: disp_A
-      - component.update: disp_A
+      - script.execute: auto_advance_page
 
 
 sensor:
