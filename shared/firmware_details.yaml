@@ -51,6 +51,22 @@ sensor:
 
 text_sensor:
   - platform: template
+    id: device_id_sensor
+    name: "Device ID"
+    entity_category: diagnostic
+    lambda: |-
+      return App.get_name();
+    update_interval: never
+
+  - platform: template
+    id: device_name_sensor
+    name: "Device Name"
+    entity_category: diagnostic
+    lambda: |-
+      return App.get_friendly_name();
+    update_interval: never
+
+  - platform: template
     id: firmware_version
     name: "Firmware version"
     entity_category: diagnostic
