@@ -76,6 +76,25 @@ wifi:
     password: ${ap_psk}
 
 
+script:
+  - id: auto_advance_page
+    mode: restart
+    then:
+      - delay: 10s
+      - display.page.show_next: disp_A
+      - component.update: disp_A
+
+
+binary_sensor:
+  - id: !extend front_button
+    on_press:
+      then:
+        - light.turn_on: display_backlight
+        - display.page.show_next: disp_A
+        - component.update: disp_A
+        - script.execute: auto_advance_page
+
+
 rc522_i2c:
   - id: !extend nfc_reader
     on_tag:
@@ -166,16 +185,28 @@ display:
             page_title: "Environment"
 
       - !include
-          file: pages-simple/page-scan.yaml
+          file: pages-simple/page-wifi.yaml
           vars:
-            page_id: page_scan
-            page_title: "Scan"
+            page_id: page_wifi
+            page_title: "Wi-Fi"
 
       - !include
           file: pages-simple/page-firmware.yaml
           vars:
             page_id: page_firmware
             page_title: "Firmware"
+
+      - !include
+          file: pages-simple/page-scan.yaml
+          vars:
+            page_id: page_scan
+            page_title: "Scan"
+
+
+interval:
+  - interval: 15s
+    then:
+      - script.execute: auto_advance_page
 
 
 sensor:
