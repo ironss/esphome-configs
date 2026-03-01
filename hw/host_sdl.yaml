@@ -29,6 +29,26 @@ sensor:
     id: internal_temperature_C
 
 
+text_sensor:
+  - platform: template
+    name: "IP address"
+    id: wifi_ipaddr
+    update_interval: never
+    lambda: 'return {"127.0.0.1"};'
+
+  - platform: template
+    name: "SSID"
+    id: wifi_ssid
+    update_interval: never
+    lambda: 'return {"(host)"};'
+
+  - platform: template
+    name: "MAC"
+    id: wifi_mac
+    update_interval: never
+    lambda: 'return {"00:00:00:00:00:00"};'
+
+
 display:
   - platform: sdl
     id: disp_A
