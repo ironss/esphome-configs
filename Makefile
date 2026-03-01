@@ -128,7 +128,9 @@ $(FACTORY_BIN) $(OTA_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN
 compile: $(FACTORY_BIN) $(OTA_BIN)
 .PHONY: compile
 
-# Use UART if available, otherwise OTA
+# Intelligent deployment: Use UART if available, otherwise OTA
+
+# Deploy-only
 deploy: $(DEVICE_FN)
 	$(ESPHOME_BIN) upload $< --device $(DEVICE_ADDRESS)
 .PHONY: deploy
