@@ -1,0 +1,54 @@
+id: page_diag
+layout:
+  type: grid
+  grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
+  grid_columns: [ content, content, content ]
+
+widgets:
+  # Title
+  - label:
+      grid_cell_column_span: 3
+      text: ${page_title}
+      text_font: heading
+
+  # Uptime
+  - label:
+      text: "Uptime"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_uptime
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_uptime
+      text: "h"
+      text_font: text_normal
+
+  # Temperature
+  - label:
+      text: "Temperature"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_temperature
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_temperature
+      text: "°C"
+      text_font: text_normal
+
+  # Battery
+  - label:
+      text: "Battery"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_battery
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_battery
+      text: "%"
+      text_font: text_normal
