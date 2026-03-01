@@ -20,7 +20,7 @@ views:
                   {%- set name_sensor = 'text_sensor.' + device_name + '_device_name_sensor' %}
                   {%- set ip_sensor = 'sensor.' + device_name + '_ip_address' %}
                   {%- set fw_sensor = 'sensor.' + device_name + '_firmware_version' %}
-                  {%- set uptime_sensor = 'sensor.' + device_name + '_uptime_sensor' %}
+                  {%- set uptime_sensor = 'sensor.' + device_name + '_uptime' %}
                   {%- set bootcount_sensor = 'sensor.' + device_name + '_bootcount' %}
               | {{ states(name_sensor) if states(name_sensor) not in ['unknown', 'unavailable'] else device_name.replace('_', '-').upper() }} | {{ states(id_sensor) if states(id_sensor) not in ['unknown', 'unavailable'] else device_name }} | {{ states(ip_sensor) if states(ip_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(fw_sensor) if states(fw_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ ((states(uptime_sensor) | float / 3600) | round(1) | string + 'h') if states(uptime_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ (states(bootcount_sensor) | int) if states(bootcount_sensor) not in ['unknown', 'unavailable'] else '—' }} |
                 {%- endif %}
@@ -38,7 +38,7 @@ views:
                   {% set ip_sensor = 'sensor.' + device_name + '_ip_address' %}
                   {% set fw_sensor = 'sensor.' + device_name + '_firmware_version' %}
                   {% set esphome_ver_sensor = 'sensor.' + device_name + '_esphome_version' %}
-                  {% set uptime_sensor = 'sensor.' + device_name + '_uptime_sensor' %}
+                  {% set uptime_sensor = 'sensor.' + device_name + '_uptime' %}
                   {% set bootcount_sensor = 'sensor.' + device_name + '_bootcount' %}
                   {% set mac_sensor = 'sensor.' + device_name + '_mac' %}
                   {% set ssid_sensor = 'sensor.' + device_name + '_ssid' %}
