@@ -153,6 +153,16 @@ sensor:
               args:
                 - 'x / 3600.0'
 
+  - id: !extend bootcount
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_diag_value_bootcount
+            text:
+              format: "%.0f"
+              args:
+                - x
+
   - platform: wifi_signal
     id: wifi_level_dBm
     name: "WiFi level"

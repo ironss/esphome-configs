@@ -11,6 +11,20 @@ widgets:
       text: ${page_title}
       text_font: heading
 
+  # Bootcount
+  - label:
+      text: "Bootcount"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_bootcount
+      grid_cell_x_align: END
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_bootcount
+      text: " "
+      text_font: text_normal
+
   # Uptime
   - label:
       text: "Uptime"
