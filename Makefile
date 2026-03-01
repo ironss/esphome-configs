@@ -26,6 +26,7 @@ endif
 
 DEVICE_UART := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_uart"]')
 DEVICE_IPADDR := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_ipaddr"]')
+DEVICE_ADDRESS := $(shell if [ -e "$(DEVICE_UART)" ]; then echo "$(DEVICE_UART)"; else echo "$(DEVICE_IPADDR)"; fi)
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
@@ -117,7 +118,7 @@ secrets.yaml: $(SECRETS_FN)
 .PHONY: secrets.yaml
 
 
-$(FACTORY_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
+$(FACTORY_BIN) $(OTA_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
 	$(ESPHOME_BIN) compile $<
 
 
@@ -127,20 +128,34 @@ $(FACTORY_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
 compile: $(FACTORY_BIN) $(OTA_BIN)
 .PHONY: compile
 
-# Deploy pre-built file - UART
+# Use UART if available, otherwise OTA
 deploy: $(DEVICE_FN)
-	$(ESPHOME_BIN) upload $< --device $(DEVICE_UART)
+	$(ESPHOME_BIN) upload $< --device $(DEVICE_ADDRESS)
 .PHONY: deploy
 
-# Compile, deploy and capture logs - UART
 run: $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
-	$(ESPHOME_BIN) run $< --device  $(DEVICE_UART)
+	$(ESPHOME_BIN) run $< --device  $(DEVICE_ADDRESS)
 .PHONY: run
 
-# Capture logs - UART
 logs: $(DEVICE_FN)
-	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
+	$(ESPHOME_BIN) logs $< --device $(DEVICE_ADDRESS)
 .PHONY: logs
+
+
+# Deploy pre-built file - UART
+deploy-uart: $(DEVICE_FN)
+	$(ESPHOME_BIN) upload $< --device $(DEVICE_UART)
+.PHONY: deploy-uart
+
+# Compile, deploy and capture logs - UART
+run-uart: $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
+	$(ESPHOME_BIN) run $< --device  $(DEVICE_UART)
+.PHONY: run-uart
+
+# Capture logs - UART
+logs-uart: $(DEVICE_FN)
+	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
+.PHONY: logs-uart
 
 # Deploy pre-built file - OTA
 deploy-ota: $(DEVICE_FN)
