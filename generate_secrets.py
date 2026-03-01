@@ -121,7 +121,7 @@ if __name__ == '__main__':
             dirty = True
         else:
             print("%s: property exists" % prop, file=sys.stderr)
-        
+
         properties[prop] = en.custom_properties[prop]
 
     if dirty:
@@ -144,6 +144,7 @@ if __name__ == '__main__':
     # Generate secrets file
 
     print("# Secrets for %s" % dev_id)
+    print("# Copyright © Stephen Irons 2026")
     print("# Generated from keepass database %s" % fn)
     print("# DO NOT EDIT")
     print()

@@ -4,6 +4,7 @@
 /.esphome/
 /.venv/
 /secrets.yaml
+/secrets-*.yaml
 
 /esphome.kdbx
 /product.db
