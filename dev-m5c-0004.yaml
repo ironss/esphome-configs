@@ -161,6 +161,11 @@ sensor:
     name: "Internal Temperature"
     update_interval: 15s
 
+  - platform: debug
+    loop_time:
+      id: loop_time_ms
+      name: "Loop time"
+
   - platform: wifi_signal
     id: wifi_level_dBm
     name: "WiFi level"

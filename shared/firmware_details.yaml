@@ -29,11 +29,6 @@ debug:
 
 
 sensor:
-  - platform: debug
-    loop_time:
-      id: loop_time_ms
-      name: "Loop time"
-
   - platform: uptime
     id: uptime_s
     type: seconds

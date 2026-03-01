@@ -143,15 +143,18 @@ sensor:
               args:
                 - x
 
-  - id: !extend loop_time_ms
-    on_value:
-      then:
-        - lvgl.label.update:
-            id: page_diag_value_loop_time
-            text:
-              format: "%.1f"
-              args:
-                - x
+  - platform: debug
+    loop_time:
+      id: loop_time_ms
+      name: "Loop time"
+      on_value:
+        then:
+          - lvgl.label.update:
+              id: page_diag_value_loop_time
+              text:
+                format: "%.1f"
+                args:
+                  - x
 
   - id: !extend uptime_s
     on_value:

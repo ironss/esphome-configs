@@ -54,6 +54,13 @@ packages:
     file: fonts/fonts-m5stick.yaml
 
 
+sensor:
+  - platform: debug
+    loop_time:
+      id: loop_time_ms
+      name: "Loop time"
+
+
 script:
   - id: auto_advance_page
     mode: restart

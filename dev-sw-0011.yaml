@@ -112,6 +112,11 @@ output:
 
 # The pins were checked with a multimeter and the datasheet for the built in BL0937.
 sensor:
+  - platform: debug
+    loop_time:
+      id: loop_time_ms
+      name: "Loop time"
+
   - platform: hlw8012
     model: BL0937
     cf_pin:
