@@ -20,7 +20,9 @@ binary_sensor:
 sensor:
   - platform: template
     id: battery_level_pc
-    name: Battery level
+
+  - platform: template
+    id: internal_temperature_C
 
 
 display:

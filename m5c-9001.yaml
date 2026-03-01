@@ -72,12 +72,6 @@ binary_sensor:
         - script.execute: auto_advance_page
 
 
-sensor:
-  - platform: template
-    id: internal_temperature_C
-    name: "Internal Temperature"
-
-
 display:
   - id: !extend disp_A
     pages:
