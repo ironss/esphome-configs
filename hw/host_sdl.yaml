@@ -20,6 +20,10 @@ binary_sensor:
 sensor:
   - platform: template
     id: battery_level_pc
+    name: "Battery Level"
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    update_interval: never
 
   - platform: template
     id: internal_temperature_C

@@ -56,6 +56,13 @@ sensor:
     pin_a: GPIO40
     pin_b: GPIO41
 
+  - platform: template
+    id: battery_level_pc
+    name: "Battery Level"
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    update_interval: never
+
 
 spi:
   id: spi_A
