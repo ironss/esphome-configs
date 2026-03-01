@@ -1,4 +1,4 @@
-id: page_diag
+id: page_environment
 layout:
   type: grid
   grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
@@ -11,44 +11,30 @@ widgets:
       text: ${page_title}
       text_font: heading
 
-  # Bootcount
+  # Temperature
   - label:
-      text: "Bootcount"
+      text: "Temperature"
       text_font: text_normal
   - label:
-      id: ${page_id}_value_bootcount
+      id: ${page_id}_value_temperature
       grid_cell_x_align: END
       text: "--"
       text_font: text_bold
   - label:
-      id: ${page_id}_unit_bootcount
-      text: " "
+      id: ${page_id}_unit_temperature
+      text: "°C"
       text_font: text_normal
 
-  # Uptime
+  # Battery
   - label:
-      text: "Uptime"
+      text: "Battery"
       text_font: text_normal
   - label:
-      id: ${page_id}_value_uptime
+      id: ${page_id}_value_battery
       grid_cell_x_align: END
       text: "--"
       text_font: text_bold
   - label:
-      id: ${page_id}_unit_uptime
-      text: "h"
-      text_font: text_normal
-
-  # Loop time
-  - label:
-      text: "Loop time"
-      text_font: text_normal
-  - label:
-      id: ${page_id}_value_loop_time
-      grid_cell_x_align: END
-      text: "--"
-      text_font: text_bold
-  - label:
-      id: ${page_id}_unit_loop_time
-      text: "ms"
+      id: ${page_id}_unit_battery
+      text: "%"
       text_font: text_normal

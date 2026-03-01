@@ -82,6 +82,12 @@ display:
             page_title: "Diagnostics"
 
       - !include
+          file: pages-simple/page-environment.yaml
+          vars:
+            page_id: page_environment
+            page_title: "Environment"
+
+      - !include
           file: pages-simple/page-test.yaml
           vars:
             page_id: page_test

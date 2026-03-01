@@ -24,12 +24,20 @@ globals:
     initial_value: '0'
     restore_value: yes
 
+debug:
+  update_interval: 10s
+
 
 sensor:
+  - platform: debug
+    loop_time:
+      id: loop_time_ms
+      name: "Loop time"
+
   - platform: uptime
     id: uptime_s
     type: seconds
-    name: Uptime Sensor
+    name: "Uptime"
 
   - platform: template
     id: bootcount
