@@ -130,9 +130,15 @@ binary_sensor:
 
 
 sensor:
+  - platform: internal_temperature
+    id: internal_temperature_C
+    name: "Internal Temperature"
+    update_interval: 15s
+
   - platform: wifi_signal
-    name: "WiFi signal sensor"
-    update_interval: 30s
+    id: wifi_level_dBm
+    name: "WiFi level"
+    update_interval: 15s
     on_value:
       then:
         - lvgl.label.update:

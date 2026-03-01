@@ -2,16 +2,16 @@ id: ${page_id}
 lambda: |-
   it.printf(${col_label}, ${row_heading}, id(heading), TextAlign::BASELINE_LEFT, "${page_title}");
 
-  it.printf(${col_label}, ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, "TBD");
-  it.printf(${col_value}, ${row_text1}, id(text_bold), TextAlign::BASELINE_RIGHT, "--");
-  it.printf(${col_unit} , ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, " ");
+  it.printf(${col_label}, ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, "Uptime");
+  it.printf(${col_value}, ${row_text1}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(uptime_s).state/3600);
+  it.printf(${col_unit} , ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, "h");
 
-  it.printf(${col_label}, ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "Battery");
-  it.printf(${col_value}, ${row_text2}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.0f", id(battery_level_pc).state);
-  it.printf(${col_unit} , ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "%%");
+  it.printf(${col_label}, ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "Temperature");
+  it.printf(${col_value}, ${row_text2}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(internal_temperature_C).state);
+  it.printf(${col_unit} , ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "°C");
 
-  it.printf(${col_label}, ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, "Uptime");
-  it.printf(${col_value}, ${row_text3}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(uptime_s).state/3600);
-  it.printf(${col_unit} , ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, "h");
+  it.printf(${col_label}, ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, "Battery");
+  it.printf(${col_value}, ${row_text3}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.0f", id(battery_level_pc).state);
+  it.printf(${col_unit} , ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, "%%");
 
   it.printf(${col_label}, ${row_text4}, id(text_normal), TextAlign::BASELINE_LEFT, "Line 4");

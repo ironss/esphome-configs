@@ -7,5 +7,5 @@ lambda: |-
   it.printf(${col_unit} , ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, " ");
 
   it.printf(${col_label}, ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "RSSI");
-  it.printf(${col_value}, ${row_text2}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(wifi_dBm).state);
+  it.printf(${col_value}, ${row_text2}, id(text_bold), TextAlign::BASELINE_RIGHT, "%.1f", id(wifi_level_dBm).state);
   it.printf(${col_unit} , ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "dBm");

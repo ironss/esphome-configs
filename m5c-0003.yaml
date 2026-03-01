@@ -131,3 +131,30 @@ interval:
     then:
       - display.page.show_next: disp_A
       - component.update: disp_A
+
+
+sensor:
+  - platform: internal_temperature
+    id: internal_temperature_C
+    name: "Internal Temperature"
+    update_interval: 15s
+
+  - platform: wifi_signal
+    id: wifi_level_dBm
+    name: "WiFi level"
+    update_interval: 15s
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      id: wifi_ipaddr
+
+    ssid:
+      name: "SSID"
+      id: wifi_ssid
+
+    mac_address:
+      name: "MAC"
+      id: wifi_mac

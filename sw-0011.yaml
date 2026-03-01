@@ -112,9 +112,6 @@ output:
 
 # The pins were checked with a multimeter and the datasheet for the built in BL0937.
 sensor:
-  - platform: internal_temperature
-    name: "Internal Temperature"
-
   - platform: hlw8012
     model: BL0937
     cf_pin:
@@ -139,3 +136,27 @@ sensor:
     update_interval: 15s
     change_mode_every: 4
 
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    id: internal_temperature_C
+    update_interval: 15s
+
+  - platform: wifi_signal
+    name: "WiFi level"
+    id: wifi_level_dBm
+    update_interval: 15s
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP address"
+      id: wifi_ipaddr
+
+    ssid:
+      name: "SSID"
+      id: wifi_ssid
+
+    mac_address:
+      name: "MAC"
+      id: wifi_mac
