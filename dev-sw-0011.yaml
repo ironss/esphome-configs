@@ -13,7 +13,7 @@ substitutions:
   device_part_number: 99-9002-0011-00
   device_model: PC191 HA Series 3
   device_serial: 99-9005-0001
-  device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0"
+  # device_uart: "/dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_01EDB825-if00-port0"
   device_ipaddr: "192.168.1.131"
   device_hostname: sw-0011
   device_uuid: 24caf015-0d63-462f-ad58-14e8d1951353
