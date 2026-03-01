@@ -98,28 +98,6 @@ light:
     output: led1
 
 
-sensor:
-  - platform: wifi_signal
-    name: WiFi Level
-    id: wifi_dBm
-    update_interval: 30s
-
-
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "IP address"
-      id: wifi_ipaddr
-
-    ssid:
-      name: "SSID"
-      id: wifi_ssid
-
-    mac_address:
-      name: "MAC"
-      id: wifi_mac
-
-
 time:
   - platform: homeassistant
     id: ha_time

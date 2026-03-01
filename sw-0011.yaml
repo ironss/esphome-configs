@@ -138,3 +138,4 @@ sensor:
     current_resistor: $bl0937_current_resistor
     update_interval: 15s
     change_mode_every: 4
+
