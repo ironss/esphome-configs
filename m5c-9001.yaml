@@ -25,7 +25,7 @@ substitutions:
 
 
 esphome:
-  name: ${device_id}
+  name: esphome-${device_id}
   friendly_name: ${device_name}
 
 
