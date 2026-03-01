@@ -18,7 +18,7 @@ endif
 
 DEVICE_BASE := $(basename $(DEVICE_FN))
 DEVICE_ID := $(patsubst dev-%,%,$(DEVICE_BASE))
-SECRETS_FN = secrets-$(DEVICE_ID).yaml
+SECRETS_FN = .secrets-$(DEVICE_ID).yaml
 
 ifeq ($(wildcard $(DEVICE_FN)),)
 $(error DEVICE file does not exist: $(DEVICE_FN))
@@ -86,7 +86,7 @@ $(BUILD_DIR)/build_details.h: Makefile
 
 # Secrets
 
-SECRETS_FILES = $(shell find secrets-*.yaml 2>/dev/null || true)
+SECRETS_FILES = $(shell find .secrets-*.yaml 2>/dev/null || true)
 generate-secrets: $(SECRETS_FN)
 .PHONY: generate-secrets
 
