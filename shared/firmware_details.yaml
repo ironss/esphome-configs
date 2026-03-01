@@ -74,4 +74,5 @@ text_sensor:
   - platform: version
     id: esphome_version
     name: "ESPHome version"
+    hide_timestamp: true
     entity_category: diagnostic

@@ -10,8 +10,8 @@ views:
           - type: markdown
             title: Device Summary Table
             content: |
-              | Device | ID | IP Address | Firmware | Uptime | Boots |
-              |--------|-----|-----------|-------------|--------|-------|
+              | Device | Device ID | Boot Count | Uptime | Firmware | ESPHome | SSID | Signal | IP Address | MAC |
+              |--------|-----------|-----------|--------|----------|---------|------|--------|-----------|-----|
               {%- set esphome_entities = integration_entities('esphome') %}
               {%- for entity_id in esphome_entities | sort %}
                 {%- if entity_id.startswith('sensor.') and entity_id.endswith('_bootcount') %}
@@ -20,9 +20,13 @@ views:
                   {%- set name_sensor = 'text_sensor.' + device_name + '_device_name_sensor' %}
                   {%- set ip_sensor = 'sensor.' + device_name + '_ip_address' %}
                   {%- set fw_sensor = 'sensor.' + device_name + '_firmware_version' %}
+                  {%- set esphome_ver_sensor = 'sensor.' + device_name + '_esphome_version' %}
                   {%- set uptime_sensor = 'sensor.' + device_name + '_uptime' %}
                   {%- set bootcount_sensor = 'sensor.' + device_name + '_bootcount' %}
-              | {{ states(name_sensor) if states(name_sensor) not in ['unknown', 'unavailable'] else device_name.replace('_', '-').upper() }} | {{ states(id_sensor) if states(id_sensor) not in ['unknown', 'unavailable'] else device_name }} | {{ states(ip_sensor) if states(ip_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(fw_sensor) if states(fw_sensor) not in ['unknown', 'unavailable'] else '—' }} | {%- if states(uptime_sensor) not in ['unknown', 'unavailable'] %}{%- set uptime_raw = states(uptime_sensor) | float %}{%- set uptime_unit = (state_attr(uptime_sensor, 'unit_of_measurement') or 's') | lower %}{%- set uptime_s = uptime_raw * (1 if uptime_unit in ['s', 'sec', 'secs', 'second', 'seconds'] else 60 if uptime_unit in ['m', 'min', 'mins', 'minute', 'minutes'] else 3600 if uptime_unit in ['h', 'hr', 'hrs', 'hour', 'hours'] else 86400 if uptime_unit in ['d', 'day', 'days'] else 1) %}{%- if uptime_s < 5400 %}{{ (uptime_s / 60) | round(1) }} min{%- elif uptime_s < 129600 %}{{ (uptime_s / 3600) | round(1) }} h{%- else %}{{ (uptime_s / 86400) | round(1) }} d{%- endif %}{%- else %}—{%- endif %} | {{ (states(bootcount_sensor) | int) if states(bootcount_sensor) not in ['unknown', 'unavailable'] else '—' }} |
+                  {%- set mac_sensor = 'sensor.' + device_name + '_mac' %}
+                  {%- set ssid_sensor = 'sensor.' + device_name + '_ssid' %}
+                  {%- set wifi_level_sensor = 'sensor.' + device_name + '_wifi_level' %}
+              | {{ states(name_sensor) if states(name_sensor) not in ['unknown', 'unavailable'] else device_name.replace('_', '-').upper() }} | {{ states(id_sensor) if states(id_sensor) not in ['unknown', 'unavailable'] else device_name }} | {{ (states(bootcount_sensor) | int) if states(bootcount_sensor) not in ['unknown', 'unavailable'] else '—' }} | {%- if states(uptime_sensor) not in ['unknown', 'unavailable'] %}{%- set uptime_raw = states(uptime_sensor) | float %}{%- set uptime_unit = (state_attr(uptime_sensor, 'unit_of_measurement') or 's') | lower %}{%- set uptime_s = uptime_raw * (1 if uptime_unit in ['s', 'sec', 'secs', 'second', 'seconds'] else 60 if uptime_unit in ['m', 'min', 'mins', 'minute', 'minutes'] else 3600 if uptime_unit in ['h', 'hr', 'hrs', 'hour', 'hours'] else 86400 if uptime_unit in ['d', 'day', 'days'] else 1) %}{%- if uptime_s < 5400 %}{{ (uptime_s / 60) | round(1) }} min{%- elif uptime_s < 129600 %}{{ (uptime_s / 3600) | round(1) }} h{%- else %}{{ (uptime_s / 86400) | round(1) }} d{%- endif %}{%- else %}—{%- endif %} | {{ states(fw_sensor) if states(fw_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(esphome_ver_sensor) if states(esphome_ver_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(ssid_sensor) if states(ssid_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(wifi_level_sensor) if states(wifi_level_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(ip_sensor) if states(ip_sensor) not in ['unknown', 'unavailable'] else '—' }} | {{ states(mac_sensor) if states(mac_sensor) not in ['unknown', 'unavailable'] else '—' }} |
                 {%- endif %}
               {%- endfor %}
 
