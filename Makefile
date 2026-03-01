@@ -7,16 +7,25 @@
 # * device public details
 # * device secrets
 
-ifeq ($(DEVICE_ID),)
-$(error DEVICE_ID is not set. Please set DEVICE_ID to the name of the device you want to build for)
+ifeq ($(DEVICE),)
+$(error DEVICE is not set. Please set DEVICE to a dev-*.yaml file)
 endif
 
+DEVICE_FN := $(notdir $(DEVICE))
+ifeq ($(filter dev-%.yaml,$(DEVICE_FN)),)
+$(error DEVICE must be a dev-*.yaml file)
+endif
 
-DEVICE_ID := $(subst .yaml,,$(DEVICE_ID))
+DEVICE_BASE := $(basename $(DEVICE_FN))
+DEVICE_ID := $(patsubst dev-%,%,$(DEVICE_BASE))
 SECRETS_FN = secrets-$(DEVICE_ID).yaml
 
-DEVICE_UART := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_uart"]')
-DEVICE_IPADDR := $(shell  cat $(DEVICE_ID).yaml | yq '.["substitutions"]["device_ipaddr"]')
+ifeq ($(wildcard $(DEVICE_FN)),)
+$(error DEVICE file does not exist: $(DEVICE_FN))
+endif
+
+DEVICE_UART := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_uart"]')
+DEVICE_IPADDR := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_ipaddr"]')
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
@@ -83,14 +92,14 @@ generate-secrets: $(SECRETS_FN)
 
 $(SECRETS_FN):
 	@rm -f $@.tmp
-	@.venv/bin/python3 generate_secrets.py >> $@.tmp
+	@DEVICE_ID=$(DEVICE_ID) .venv/bin/python3 generate_secrets.py >> $@.tmp
 	@diff -N --unchanged-line-format '' --old-line-format '-%L' --new-line-format '+%L' $@ $@.tmp || mv $@.tmp $@
 	@rm -f $@.tmp
 .PHONY: $(SECRETS_FN)
 
 secrets.yaml: $(SECRETS_FN)
 	@rm -f $@.tmp
-	@echo "# Secrets for sw-0011" >> $@.tmp
+	@echo "# Main secrets file" >> $@.tmp
 	@echo "# Copyright © Stephen Irons 2026" >> $@.tmp
 	@echo "# Generated from recipe in Makefile" >> $@.tmp
 	@echo "# DO NOT EDIT" >> $@.tmp
@@ -104,22 +113,22 @@ secrets.yaml: $(SECRETS_FN)
 
 # Tasks
 
-compile: $(DEVICE_ID).yaml vc-version secrets.yaml
+compile: $(DEVICE_FN) vc-version secrets.yaml
 	$(ESPHOME_BIN) compile $<
 .PHONY: compile
 
-run: $(DEVICE_ID).yaml vc-version secrets.yaml
+run: $(DEVICE_FN) vc-version secrets.yaml
 	$(ESPHOME_BIN) run $< --device  $(DEVICE_UART)
 .PHONY: run
 
-logs: $(DEVICE_ID).yaml vc-version secrets.yaml
+logs: $(DEVICE_FN) vc-version secrets.yaml
 	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
 .PHONY: logs
 
-run-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
+run-ota: $(DEVICE_FN) vc-version secrets.yaml
 	$(ESPHOME_BIN) run $< --device $(DEVICE_IPADDR)
 .PHONY: run-ota
 
-logs-ota: $(DEVICE_ID).yaml vc-version secrets.yaml
+logs-ota: $(DEVICE_FN) vc-version secrets.yaml
 	$(ESPHOME_BIN) logs $< --device $(DEVICE_IPADDR)
 .PHONY: logs-ota
