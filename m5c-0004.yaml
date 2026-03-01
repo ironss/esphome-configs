@@ -85,6 +85,7 @@ binary_sensor:
       then:
         - light.turn_on: light1
         - display.page.show_next: disp_A
+        - component.update: disp_A
 
     on_release:
       then:
