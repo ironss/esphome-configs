@@ -1,0 +1,15 @@
+id: ${page_id}
+lambda: |-
+  it.printf(${col_label}, ${row_heading}, id(heading), TextAlign::BASELINE_LEFT, "${page_title}");
+
+  it.printf(${col_label}, ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, "Firmware");
+  it.printf(${col_value}, ${row_text1}, id(text_bold), TextAlign::BASELINE_RIGHT, "%s", id(firmware_version).state.c_str());
+  it.printf(${col_unit} , ${row_text1}, id(text_normal), TextAlign::BASELINE_LEFT, " ");
+
+  it.printf(${col_label}, ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, "Build ULID");
+  it.printf(${col_value}, ${row_text2}, id(text_bold), TextAlign::BASELINE_RIGHT, "%s", id(build_ulid).state.c_str());
+  it.printf(${col_unit} , ${row_text2}, id(text_normal), TextAlign::BASELINE_LEFT, " ");
+
+  it.printf(${col_label}, ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, "ESPHome");
+  it.printf(${col_value}, ${row_text3}, id(text_bold), TextAlign::BASELINE_RIGHT, "%s", id(esphome_version).state.c_str());
+  it.printf(${col_unit} , ${row_text3}, id(text_normal), TextAlign::BASELINE_LEFT, " ");

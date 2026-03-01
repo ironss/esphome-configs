@@ -51,3 +51,8 @@ text_sensor:
     id: build_ulid
     name: "Build ULID"
     entity_category: diagnostic
+
+  - platform: version
+    id: esphome_version
+    name: "ESPHome version"
+    entity_category: diagnostic

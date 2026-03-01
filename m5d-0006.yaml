@@ -165,6 +165,12 @@ display:
             page_id: page_scan
             page_title: "Scan"
 
+      - !include
+          file: pages-simple/page-firmware.yaml
+          vars:
+            page_id: page_firmware
+            page_title: "Firmware"
+
 
 sensor:
   - platform: internal_temperature

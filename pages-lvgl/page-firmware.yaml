@@ -1,0 +1,54 @@
+id: page_firmware
+layout:
+  type: grid
+  grid_rows: [ content, content, content, content, content, content, content, content, content, content ]
+  grid_columns: [ content, content, content ]
+
+widgets:
+  # Title
+  - label:
+      grid_cell_column_span: 3
+      text: ${page_title}
+      text_font: heading
+
+  # Firmware Version
+  - label:
+      text: "Firmware"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_firmware
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_firmware
+      text: " "
+      text_font: text_normal
+
+  # Build ULID
+  - label:
+      text: "Build ULID"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_build_ulid
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_build_ulid
+      text: " "
+      text_font: text_normal
+
+  # ESPHome Version
+  - label:
+      text: "ESPHome"
+      text_font: text_normal
+  - label:
+      id: ${page_id}_value_esphome_version
+      grid_cell_x_align: START
+      text: "--"
+      text_font: text_bold
+  - label:
+      id: ${page_id}_unit_esphome_version
+      text: " "
+      text_font: text_normal

@@ -125,6 +125,12 @@ display:
             page_title: "Text test page"
             test_text: "AGKMQRWXadibegjmqptwy"
 
+      - !include
+          file: pages-simple/page-firmware.yaml
+          vars:
+            page_id: page_firmware
+            page_title: "Firmware"
+
 
 interval:
   - interval: 10s

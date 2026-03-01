@@ -389,6 +389,36 @@ text_sensor:
                 args:
                   - x.c_str()
 
+  - id: !extend firmware_version
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_firmware_value_firmware
+            text:
+              format: "%s"
+              args:
+                - x.c_str()
+
+  - id: !extend build_ulid
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_firmware_value_build_ulid
+            text:
+              format: "%s"
+              args:
+                - x.c_str()
+
+  - id: !extend esphome_version
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: page_firmware_value_esphome_version
+            text:
+              format: "%s"
+              args:
+                - x.c_str()
+
 
 time:
   - platform: homeassistant
@@ -417,6 +447,12 @@ lvgl:
         vars:
           page_id: page_diag
           page_title: "Diagnostics"
+
+    - !include
+        file: pages-lvgl/page-firmware.yaml
+        vars:
+          page_id: page_firmware
+          page_title: "Firmware"
 
 
 http_request:
