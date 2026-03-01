@@ -29,6 +29,9 @@ DEVICE_IPADDR := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_ipad
 
 BUILD_DIR := .
 ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
+OUTPUT_DIR := $(BUILD_DIR)/.esphome/build/$(DEVICE_ID)/.pioenvs/$(DEVICE_ID)
+FACTORY_BIN := $(OUTPUT_DIR)/firmware.factory.bin
+OTA_BIN := $(OUTPUT_DIR)/firmware.ota.bin
 
 
 compile:
@@ -83,6 +86,8 @@ $(BUILD_DIR)/build_details.h: Makefile
 	@rm -f $@.tmp
 .PHONY: $(BUILD_DIR)/build_details.h
 
+INCLUDE_FILES = $(BUILD_DIR)/vc_version.h $(BUILD_DIR)/build_details.h
+
 
 # Secrets
 
@@ -106,29 +111,48 @@ secrets.yaml: $(SECRETS_FN)
 	@echo "" >> $@.tmp
 	@for fn in $(SECRETS_FN) $(SECRETS_FILES); do \
 		echo "<<: !include $$fn"; \
-	done | awk '!seen[$$0]++' >> $@.tmp
+	done | sort | awk '!seen[$$0]++' >> $@.tmp
 	@diff -N --unchanged-line-format '' --old-line-format '-%L' --new-line-format '+%L' $@ $@.tmp || mv $@.tmp $@
 	@rm -f $@.tmp
 .PHONY: secrets.yaml
 
+
+$(FACTORY_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
+	$(ESPHOME_BIN) compile $<
+
+
 # Tasks
 
-compile: $(DEVICE_FN) vc-version secrets.yaml
-	$(ESPHOME_BIN) compile $<
+# Compile only
+compile: $(FACTORY_BIN) $(OTA_BIN)
 .PHONY: compile
 
-run: $(DEVICE_FN) vc-version secrets.yaml
+# Deploy pre-built file - UART
+deploy: $(DEVICE_FN)
+	$(ESPHOME_BIN) upload $< --device $(DEVICE_UART)
+.PHONY: deploy
+
+# Compile, deploy and capture logs - UART
+run: $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
 	$(ESPHOME_BIN) run $< --device  $(DEVICE_UART)
 .PHONY: run
 
-logs: $(DEVICE_FN) vc-version secrets.yaml
+# Capture logs - UART
+logs: $(DEVICE_FN)
 	$(ESPHOME_BIN) logs $< --device $(DEVICE_UART)
 .PHONY: logs
 
-run-ota: $(DEVICE_FN) vc-version secrets.yaml
+# Deploy pre-built file - OTA
+deploy-ota: $(DEVICE_FN)
+	$(ESPHOME_BIN) upload $< --device $(DEVICE_IPADDR)
+.PHONY: deploy-ota
+
+# Compile, deploy and capture logs - OTA
+run-ota: $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
 	$(ESPHOME_BIN) run $< --device $(DEVICE_IPADDR)
 .PHONY: run-ota
 
-logs-ota: $(DEVICE_FN) vc-version secrets.yaml
+# Capture logs - OTA
+logs-ota: $(DEVICE_FN)
 	$(ESPHOME_BIN) logs $< --device $(DEVICE_IPADDR)
 .PHONY: logs-ota
