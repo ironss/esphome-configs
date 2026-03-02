@@ -83,15 +83,15 @@ if __name__ == '__main__':
         print("Missing DEVICE_ID", file=sys.stderr)
         sys.exit(1)
 
-    fn = os.getenv('KEEPASS_DATABASE')
-    pw = os.getenv('KEEPASS_PASSWORD')
+    fn = os.getenv('ESPHOME_SECRETS_DATABASE')
+    pw = os.getenv('ESPHOME_SECRETS_PASSWORD')
 
     if not fn:
-        print('Missing KEEPASS_DATABASE', file=sys.stderr)
+        print('Missing ESPHOME_SECRETS_DATABASE', file=sys.stderr)
         sys.exit(1)
 
     if not pw:
-        print('Missing KEEPASS_PASSWORD', file=sys.stderr)
+        print('Missing KEEPASS_SECRETS_PASSWORD', file=sys.stderr)
         sys.exit(1)
 
 

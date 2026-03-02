@@ -29,7 +29,7 @@ DEVICE_IPADDR := $(shell  cat $(DEVICE_FN) | yq '.["substitutions"]["device_ipad
 DEVICE_ADDRESS := $(shell if [ -e "$(DEVICE_UART)" ]; then echo "$(DEVICE_UART)"; else echo "$(DEVICE_IPADDR)"; fi)
 
 BUILD_DIR := .
-ESPHOME_BIN := ../esphome-dev/venv/bin/esphome
+ESPHOME_BIN := .venv/bin/esphome
 OUTPUT_DIR := $(BUILD_DIR)/.esphome/build/$(DEVICE_ID)/.pioenvs/$(DEVICE_ID)
 FACTORY_BIN := $(OUTPUT_DIR)/firmware.factory.bin
 OTA_BIN := $(OUTPUT_DIR)/firmware.ota.bin
@@ -118,7 +118,7 @@ secrets.yaml: $(SECRETS_FN)
 .PHONY: secrets.yaml
 
 
-$(FACTORY_BIN) $(OTA_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN)
+$(FACTORY_BIN) $(OTA_BIN): $(DEVICE_FN) vc-version $(INCLUDE_FILES) $(SECRETS_FN) secrets.yaml
 	$(ESPHOME_BIN) compile $<
 
 

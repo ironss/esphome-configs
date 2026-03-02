@@ -1,10 +1,40 @@
 ESPHome notes
 #############
 
-Usage
-=====
+
+New usage
+=========
+* Get ESPHome fork
+    * git checkout --branch sgi/delay-delta git@github.com-private:ironss/esphome-dev.git
+
+* Get the ESPHome configurations
+    * git checkout git@github.com-private:ironss/esphome-configs.git
+
+* Set up
+    * sudo apt install yq
+    * sudo apt install libsdl2-dev
+    * python3 -m venv .venv
+    * .venv/bin/pip install uv
+    * .venv/bin/uv pip install setuptools wheel
+    * .venv/bin/uv pip install -e "../esphome-dev/[dev,test]" --config-setting editable_mode=compat
+    * .venv/bin/uv pip install -r pip-requirements.txt
+
+* Use the make system
+    * Get the keepass database
+    * Add the filename and password to ~/.secrets
+    * Add the secrets to the shell environment
+        * export $(cat ~/.secrets | xargs)
+    * Build
+        * DEVICE=dev-m5c-9001.yaml DEVICE=dev-m5c-9001.yaml make
+    * or, instaed of those last two, to avoid actually setting secrets in the shell
+        * env $(cat ~/.secrets | xargs) DEVICE=dev-m5c-9001.yaml make
+
+
+Old usage
+=========
+
 * Set up ESPHome development fork in esphome-dev
-    * git checkout git@github.com-private:ironss/esphome-dev.git
+    * git checkout --branch sgi/delay-delta git@github.com-private:ironss/esphome-dev.git
     * cd esphome-dev
     * script/setup
     * cd ..
@@ -16,6 +46,7 @@ Usage
     * cd esphome-configs
     * source ../esphome-dev/venv/bin/activate
     * esphome run <config.yaml> --device /dev/serial/by-id/usb-<device>
+
 
 
 Config-file structure
@@ -176,45 +207,3 @@ Fonts
         * Put it in the fonts directory
         * Verify that it works
         * Add it to version control, using '-f' to override the ignore.
-
-
-Product database
-================
-
-* Device_type
-    * ULID
-    * Model_number
-    * Informal_name
-    * Descriptor
-    * Serial_number_spec
-
-* Device_type_attribute
-    * ULID
-    * Device_type (-> Device_type.ULID)
-    * Attribute name
-    * Multiplicity
-        * 1 -- required
-        * 0..1 -- optional
-        * 0..* -- optional, many allowed
-        * 1..* -- required, many allowed
-
-* Device
-    * ULID
-    * Device_type (-> Device_type.ULID)
-    * Manufacturer_name
-    * Model_number
-    * Serial_number
-
-* Device attribute
-    * ULID
-    * Device (-> Device.ULID)
-    * Attribute (-> Device_type.ULID)
-    * Value
-
-* History entry
-    * ULID
-    * Entity (-> ULID of Device_type, Device_type_attribute, Device or Device_attribute)
-    * Timestamp
-    * Operation -- TBD -- formal description of what changed to what
-    * Comment -- informal description
-
